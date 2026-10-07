@@ -1,71 +1,233 @@
-/* Reset di base */
+/* Variabili CSS per la gestione del Tema Chiaro/Scuro assoluto */
+:root {
+    --bg-color: #f3f4f6;
+    --text-color: #1c1c1e;
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.4);
+    --overlay-bg: rgba(255, 255, 255, 0.3);
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] {
+    --bg-color: #000000;
+    --text-color: #ffffff;
+    --glass-bg: rgba(30, 30, 30, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --overlay-bg: rgba(0, 0, 0, 0.5);
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Sfondo nero puro e centratura dei contenuti */
 body {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.4s ease, color 0.4s ease;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Header in alto */
+.glass-header {
+    width: 90%;
+    max-width: 600px;
+    margin-top: 20px;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 50px; /* Stile pillola anche per l'header */
+    box-shadow: var(--shadow);
+}
+
+#app-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+/* Stile base dei pannelli Glass */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 30px;
+}
+
+/* Bottoni Pill-Shaped degli Anni */
+.years-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.year-pill {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 50px;
+    padding: 20px 30px;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.year-pill:hover {
+    transform: scale(1.02);
+    background: rgba(120, 120, 120, 0.1);
+}
+
+/* Pallino a sinistra del testo */
+.dot {
+    width: 12px;
+    height: 12px;
+    background-color: var(--text-color);
+    border-radius: 50%;
+    margin-right: 15px;
+    opacity: 0.7;
+}
+
+/* Modal Overlay (Sfondo sfocato che chiude al click) */
+.overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--overlay-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
 }
 
-/* Stile Glassmorphism per i contenitori */
-.view {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 40px;
+.overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Contenuto del Modal animato */
+.modal-content {
     width: 90%;
-    max-width: 400px;
-    text-align: center;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    transform: scale(1);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Stile del campo password */
-#pass-input {
-    width: 100%;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    font-size: 16px;
-    outline: none;
-    transition: border 0.3s ease;
+.overlay.hidden .modal-content {
+    transform: scale(0.8);
 }
 
-#pass-input:focus {
-    border-color: #ffffff;
+/* Header del Modal con Freccia e Titolo */
+.modal-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 15px;
 }
 
-/* Stile del bottone */
-button {
-    width: 100%;
-    padding: 15px;
-    border-radius: 12px;
+.back-arrow-btn {
+    background: none;
     border: none;
-    background-color: #ffffff;
-    color: #000000;
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-color);
+    margin-right: 15px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(120,120,120,0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-button:hover {
-    background-color: #e0e0e0;
+/* Griglia per le materie */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
 }
 
-button:active {
-    transform: scale(0.98);
+/* Box materie (ispirate agli eventi del calendario) */
+.subject-box {
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-color);
+    cursor: pointer;
+    aspect-ratio: 1; /* Rende i box quadrati */
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    transition: transform 0.2s;
+}
+
+.subject-box:hover {
+    transform: scale(1.05);
+}
+
+/* Esempi di colori glassati per le materie */
+.color-red { background: rgba(255, 59, 48, 0.2); }
+.color-blue { background: rgba(0, 122, 255, 0.2); }
+.color-green { background: rgba(52, 199, 89, 0.2); }
+.color-yellow { background: rgba(255, 204, 0, 0.2); }
+.color-purple { background: rgba(175, 82, 222, 0.2); }
+
+/* Input e bottoni generici */
+.glass-input, .glass-btn {
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: rgba(120, 120, 120, 0.1);
+    color: var(--text-color);
+    font-size: 16px;
+}
+
+.glass-btn {
+    background: var(--text-color);
+    color: var(--bg-color);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.glass-icon-btn {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
 }
