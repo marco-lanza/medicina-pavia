@@ -44,7 +44,7 @@ function gestisciRotta() {
     if (!user) {
       if (hash !== '#/login') {
         sessionStorage.setItem('urlDesiderato', hash);
-        window.location.hash = '#/login';
+        window.location.replace('#/login');
       }
       mostraSchermata('view-login');
     } else {
