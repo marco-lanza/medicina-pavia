@@ -27,34 +27,48 @@ const analytics = getAnalytics(app);
 
 // --- LOGICA DEL SITO ---
 
-// Funzione utile per nascondere tutte le schermate e mostrare solo quella voluta
+// Funzione migliorata che nasconde tutto e mostra solo l'ID richiesto
 function mostraSchermata(idView) {
-  document.getElementById('view-login').style.display = 'none';
-  document.getElementById('view-anni').style.display = 'none';
-  document.getElementById('view-materie').style.display = 'none';
+  const tutteLeView = document.querySelectorAll('.view');
+  tutteLeView.forEach(view => view.style.display = 'none'); // Nasconde tutte
   
-  document.getElementById(idView).style.display = 'block';
+  const viewDaMostrare = document.getElementById(idView);
+  if (viewDaMostrare) {
+    viewDaMostrare.style.display = 'block'; // Mostra solo quella giusta
+  }
 }
 
+// Nuovo sistema di Routing
 function gestisciRotta() {
-  const hash = window.location.hash || '#/home';
+  const hash = window.location.hash || '#/anni';
   
-  // Controlliamo se l'utente ha inserito la password corretta
   onAuthStateChanged(auth, (user) => {
     if (!user) {
       if (hash !== '#/login') {
         sessionStorage.setItem('urlDesiderato', hash);
-        window.location.replace('#/login');
+        window.location.replace('#/login'); // Usiamo replace per non sporcare la cronologia
       }
       mostraSchermata('view-login');
     } else {
       if (hash === '#/login') {
-        window.location.hash = sessionStorage.getItem('urlDesiderato') || '#/anni';
-      } else if (hash.startsWith('#/terzo-anno/')) {
-        const materia = hash.split('/')[2]; 
-        caricaMateria(materia);
+        window.location.replace(sessionStorage.getItem('urlDesiderato') || '#/anni');
+      } 
+      // Gestione degli anni
+      else if (hash === '#/anni') { mostraSchermata('view-anni'); }
+      else if (hash === '#/primo-anno') { mostraSchermata('view-primo-anno'); }
+      else if (hash === '#/secondo-anno') { mostraSchermata('view-secondo-anno'); }
+      else if (hash === '#/terzo-anno') { mostraSchermata('view-terzo-anno'); }
+      else if (hash === '#/quarto-anno') { mostraSchermata('view-quarto-anno'); }
+      else if (hash === '#/quinto-anno') { mostraSchermata('view-quinto-anno'); }
+      else if (hash === '#/sesto-anno') { mostraSchermata('view-sesto-anno'); }
+      
+      // Gestione della singola materia (es: #/materia/semeiotica-medica)
+      else if (hash.startsWith('#/materia/')) {
+        const idMateriaFirebase = hash.split('/')[2]; 
+        caricaMateria(idMateriaFirebase);
         mostraSchermata('view-materie');
-      } else {
+      } 
+      else {
         mostraSchermata('view-anni');
       }
     }
