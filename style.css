@@ -1,227 +1,179 @@
-/* Variabili globali identiche al tuo Calendario */
+/* Variabili per la modalità Chiara/Scura */
 :root {
-    --bg-body: #f5f5f7;
+    --bg-base: #f5f5f7;
     --text-main: #111827;
     --text-muted: #6b7280;
-    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-bg: rgba(255, 255, 255, 0.65);
     --glass-border: rgba(255, 255, 255, 0.8);
-    --element-bg: rgba(0, 0, 0, 0.05);
-    --element-hover: rgba(0, 0, 0, 0.1);
-    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.05);
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-    --accent: #007aff;
+    --blob-1: #ffb4d6;
+    --blob-2: #c4d9ff;
+    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.08);
 }
 
 html.dark {
-    --bg-body: #000000;
+    --bg-base: #000000;
     --text-main: #f3f4f6;
     --text-muted: #9ca3af;
-    --glass-bg: rgba(18, 18, 18, 0.8);
-    --glass-border: rgba(255, 255, 255, 0.05);
-    --element-bg: rgba(255, 255, 255, 0.1);
-    --element-hover: rgba(255, 255, 255, 0.2);
-    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.5);
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.5);
+    --glass-bg: rgba(30, 30, 30, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --blob-1: #3b0a45;
+    --blob-2: #082046;
+    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
 * {
-    box-sizing: border-box;
-    margin: 0; padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    box-sizing: border-box; margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
     -webkit-font-smoothing: antialiased;
 }
 
 body {
-    background-color: var(--bg-body);
-    color: var(--text-main);
-    transition: background-color 0.4s ease, color 0.4s ease;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow: hidden;
+    background-color: var(--bg-base); color: var(--text-main);
+    transition: background-color 0.4s ease;
+    height: 100vh; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center;
 }
 
-/* --- HEADER E TOGGLE --- */
-.top-nav {
-    width: 100%; max-width: 600px;
-    padding: 20px 24px;
-    display: flex; justify-content: space-between; align-items: center;
-    z-index: 10;
+/* --- SFONDO BLURATO DINAMICO --- */
+.ambient-bg {
+    position: fixed; inset: 0; z-index: -1; overflow: hidden;
+    background: var(--bg-base);
 }
-
-.nav-title {
-    font-size: 24px; font-weight: 700;
-    letter-spacing: -0.5px;
+.blob {
+    position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6;
+    transition: background 0.8s ease;
 }
+.blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--blob-1); }
+.blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: var(--blob-2); }
 
-.theme-toggle-container {
-    position: relative; width: 72px; height: 36px;
-    background: var(--element-bg); border-radius: 36px;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 4px; cursor: pointer; transition: background 0.3s;
-}
-
-.theme-slider {
-    position: absolute; top: 4px; left: 4px;
-    width: 28px; height: 28px;
-    background: white; border-radius: 50%;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-html.dark .theme-slider {
-    background: #333; transform: translateX(36px);
-}
-
-.theme-icon {
-    width: 28px; text-align: center;
-    font-size: 14px; color: var(--text-muted);
-}
-html.dark .theme-icon .fa-moon { color: white; }
-html:not(.dark) .theme-icon .fa-sun { color: #f59e0b; }
-
-/* --- CONTENITORE CENTRALE --- */
-.app-main {
-    flex: 1; width: 100%; max-width: 800px;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 20px;
-}
-
-/* --- STILE GLASS CONDIVISO --- */
-.glass-panel {
+/* --- VETRO SATINATO (Base per Pannelli e Pillole) --- */
+.glass-panel, .glass-pill, .morph-panel {
     background: var(--glass-bg);
     backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
     border: 1px solid var(--glass-border);
     box-shadow: var(--shadow-main);
 }
 
-/* --- LOGIN --- */
-.login-panel {
-    width: 100%; max-width: 360px;
-    padding: 40px 30px; border-radius: 36px;
-    text-align: center;
+/* --- HEADER PILL-SHAPED --- */
+.top-header {
+    width: 90%; max-width: 600px; margin-top: 20px;
+    border-radius: 50px; padding: 15px 25px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 10;
 }
+.nav-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+
+/* FIX SLIDER TEMA */
+.theme-toggle-container {
+    position: relative; width: 70px; height: 34px;
+    background: rgba(120, 120, 120, 0.2); border-radius: 34px;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; padding: 4px;
+}
+.theme-slider {
+    position: absolute; top: 4px; left: 4px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 1; /* Sotto le icone */
+}
+html.dark .theme-slider { background: #444; transform: translateX(36px); }
+.theme-icon {
+    width: 26px; text-align: center; font-size: 13px;
+    z-index: 2; /* Sopra il pallino */
+    pointer-events: none; color: var(--text-main);
+    transition: color 0.3s;
+}
+
+/* --- CONTENITORE CENTRALE --- */
+.app-main {
+    flex: 1; width: 100%; max-width: 800px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+}
+.view-section { width: 100%; display: flex; flex-direction: column; align-items: center; }
+
+/* --- LOGIN --- */
+.login-panel { width: 90%; max-width: 360px; padding: 40px 30px; border-radius: 36px; text-align: center; }
 .login-panel h2 { font-size: 22px; font-weight: 700; margin-bottom: 5px; }
 .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; }
 
-.apple-input {
-    width: 100%; padding: 16px 20px;
-    border-radius: 18px; border: 1px solid transparent;
-    background: var(--element-bg); color: var(--text-main);
-    font-size: 16px; font-weight: 600; outline: none;
-    transition: border 0.3s; margin-bottom: 15px;
+.glass-input {
+    width: 100%; padding: 16px; border-radius: 16px; border: 1px solid var(--glass-border);
+    background: rgba(120,120,120,0.1); color: var(--text-main);
+    font-size: 16px; font-weight: 600; outline: none; margin-bottom: 15px;
 }
-.apple-input:focus { border-color: var(--text-muted); }
-
-.apple-btn-solid {
-    width: 100%; padding: 16px; border-radius: 18px; border: none;
-    background: var(--text-main); color: var(--bg-body);
-    font-size: 16px; font-weight: 700; cursor: pointer;
-    transition: transform 0.2s;
-}
-.apple-btn-solid:active { transform: scale(0.97); }
-
-/* --- PILLOLE DEGLI ANNI --- */
-.years-container {
-    width: 100%; max-width: 340px; /* Larghezza fissa ed elegante */
-    display: flex; flex-direction: column; gap: 12px;
+.glass-btn-solid {
+    width: 100%; padding: 16px; border-radius: 16px; border: none;
+    background: var(--text-main); color: var(--bg-base); font-size: 16px; font-weight: 700; cursor: pointer;
 }
 
-.year-pill {
-    width: 100%; padding: 18px 24px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-    border: 1px solid var(--glass-border); border-radius: 50px;
-    display: flex; align-items: center;
-    cursor: pointer; box-shadow: var(--shadow-sm);
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+/* --- BOTTONI ANNI --- */
+.years-container { gap: 14px; width: 90%; max-width: 360px; }
+.year-btn {
+    width: 100%; padding: 20px 25px; border-radius: 50px;
+    display: flex; align-items: center; cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
 }
-.year-pill:hover { background: var(--element-bg); transform: scale(1.02); }
-.year-pill:active { transform: scale(0.98); }
+.year-btn:hover { background: rgba(120,120,120,0.1); transform: scale(1.02); }
 
 .pill-dot {
-    width: 12px; height: 12px; border-radius: 50%;
-    background-color: var(--text-main); opacity: 0.2;
-    margin-right: 16px; transition: all 0.4s ease;
+    width: 12px; height: 12px; border-radius: 50%; background-color: var(--text-main);
+    opacity: 0.3; margin-right: 18px;
 }
-html.dark .pill-dot { opacity: 0.4; background-color: white; }
 .pill-text { font-size: 18px; font-weight: 600; color: var(--text-main); }
 
-/* --- ANIMAZIONE E PANNELLO ESPANSO --- */
+/* --- IL MODALE (MORPHING E BLUR) --- */
 .modal-backdrop {
     position: fixed; inset: 0; z-index: 50;
-    display: flex; justify-content: center; align-items: center;
-    background: rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    opacity: 1; transition: opacity 0.4s ease;
+    background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    transition: opacity 0.5s ease, backdrop-filter 0.5s ease;
 }
-html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.5); }
-.modal-backdrop.hidden { opacity: 0; pointer-events: none; }
-
-.expanded-panel {
-    width: 90%; max-width: 600px;
-    background: var(--glass-bg); border: 1px solid var(--glass-border);
-    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-    border-radius: 36px; padding: 24px;
-    box-shadow: var(--shadow-main);
-    
-    /* Il trucco dell'animazione: parte stretto e arrotondato, poi si espande */
-    transform: scale(0.85) translateY(20px);
-    opacity: 0;
-    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); /* Curva super morbida Apple */
+html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.6); }
+.modal-backdrop.hidden {
+    opacity: 0; pointer-events: none; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px);
 }
 
-.modal-backdrop:not(.hidden) .expanded-panel {
-    transform: scale(1) translateY(0);
-    opacity: 1;
+/* Il pannello che si espande dal bottone */
+.morph-panel {
+    position: absolute; /* Fondamentale per il morphing */
+    overflow: hidden;
+    /* La transizione gestisce lo spostamento, l'allargamento e lo smussamento */
+    transition: top 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                left 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                border-radius 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+                transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Header del pannello espanso */
-.panel-header {
-    display: flex; align-items: center;
-    margin-bottom: 24px; padding-bottom: 16px;
-    border-bottom: 1px solid var(--glass-border);
-}
+/* Contenuti interni che sfumano dopo l'espansione */
+.panel-header, .subjects-grid { transition: opacity 0.3s ease; transition-delay: 0.2s; }
+.panel-header { display: flex; align-items: center; border-bottom: 1px solid var(--glass-border); padding: 25px; }
 
-/* Il bottone indietro nato dal pallino */
+/* Tasto indietro che simula il pallino */
 .morph-back-btn {
     width: 36px; height: 36px; border-radius: 50%; border: none;
-    background: var(--element-bg); color: var(--text-main);
+    background: rgba(120,120,120,0.2); color: var(--text-main);
     display: flex; justify-content: center; align-items: center;
-    margin-right: 16px; cursor: pointer; font-size: 14px;
-    transition: background 0.2s, transform 0.2s;
+    margin-right: 15px; cursor: pointer; transition: transform 0.2s;
 }
-.morph-back-btn:hover { background: var(--element-hover); transform: scale(1.05); }
+.morph-back-btn:hover { transform: scale(1.08); }
+.panel-title { font-size: 22px; font-weight: 700; }
 
-.panel-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
-
-/* Griglia delle materie satinata */
-.subjects-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 12px;
-}
-
+.subjects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; padding: 25px; }
 .subject-card {
-    aspect-ratio: 1; border-radius: 24px; padding: 16px;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    text-align: center; font-size: 14px; font-weight: 700;
-    cursor: pointer; transition: transform 0.2s;
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    box-shadow: var(--shadow-sm); border: 1px solid var(--glass-border);
+    aspect-ratio: 1; border-radius: 24px; padding: 15px; text-align: center;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.2s;
+    border: 1px solid var(--glass-border);
 }
-.subject-card:hover { transform: scale(1.03); }
+.subject-card:hover { transform: scale(1.05); }
 
-/* Colori materie prelevati dal tuo calendario */
-.s-red { background: rgba(255, 59, 48, 0.18); color: #c91408; }
-.s-blue { background: rgba(0, 122, 255, 0.18); color: #005bb5; }
-.s-green { background: rgba(52, 199, 89, 0.18); color: #248a3d; }
-.s-yellow { background: rgba(255, 204, 0, 0.18); color: #a38200; }
-.s-purple { background: rgba(175, 82, 222, 0.18); color: #7b31a3; }
-
-html.dark .s-red { background: rgba(255, 59, 48, 0.25); color: #ff6b60; }
-html.dark .s-blue { background: rgba(0, 122, 255, 0.25); color: #4da6ff; }
-html.dark .s-green { background: rgba(52, 199, 89, 0.25); color: #5ddb80; }
-html.dark .s-yellow { background: rgba(255, 204, 0, 0.25); color: #ffe033; }
-html.dark .s-purple { background: rgba(175, 82, 222, 0.25); color: #c985f0; }
+/* Colori materie in stile calendario */
+.s-red { background: rgba(255, 59, 48, 0.2); color: #c91408; }
+.s-blue { background: rgba(0, 122, 255, 0.2); color: #005bb5; }
+.s-yellow { background: rgba(255, 204, 0, 0.2); color: #a38200; }
+html.dark .s-red { color: #ff6b60; }
+html.dark .s-blue { color: #4da6ff; }
+html.dark .s-yellow { color: #ffe033; }
