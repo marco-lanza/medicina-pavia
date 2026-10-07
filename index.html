@@ -1,22 +1,22 @@
 <!DOCTYPE html>
-<html lang="it" class="light">
+<html lang="it" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Medicina Pavia</title>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Solo FontAwesome, NESSUN link a Google Fonts per SF Pro -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Sfondo con sfumature per far risaltare il vetro satinato -->
+    <!-- Sfondo con sfumature (molto attenuate) -->
     <div class="ambient-bg">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
     </div>
 
-    <!-- Header Pill-Shaped in Vetro -->
+    <!-- Header sempre in primo piano -->
     <header class="glass-pill top-header">
         <h1 class="nav-title">Medicina Pavia</h1>
         <div class="theme-toggle-container" onclick="toggleTheme()">
@@ -28,16 +28,16 @@
 
     <main id="app-container" class="app-main">
         
-        <!-- Schermata Login (Gestita dal Router JS) -->
+        <!-- Schermata Login (Gestita dal vero Firebase in JS) -->
         <div id="view-login" class="view-section glass-panel login-panel">
             <h2>Area Riservata</h2>
-            <p class="subtitle">Inserisci la password di accesso</p>
             <input type="password" id="pass-input" placeholder="Password" class="glass-input">
             <button id="btn-login" class="glass-btn-solid">Accedi</button>
         </div>
 
         <!-- Schermata Anni -->
         <div id="view-anni" class="view-section years-container" style="display: none;">
+            <!-- I bottoni non fanno un "pop", ma passano i loro dati all'animazione -->
             <button class="glass-pill year-btn" onclick="apriPannelloAnno('Primo Anno', 'primo-anno', this)">
                 <div class="pill-dot"></div> <span class="pill-text">Primo Anno</span>
             </button>
@@ -57,27 +57,33 @@
                 <div class="pill-dot"></div> <span class="pill-text">Sesto Anno</span>
             </button>
         </div>
-
     </main>
 
-    <!-- Overlay e Pannello che fa Morphing -->
-    <div id="modal-overlay" class="modal-backdrop hidden">
-        <!-- Il pannello parte dalle coordinate del bottone -->
-        <div id="modal-content" class="morph-panel">
-            <div class="panel-header" id="panel-header" style="opacity: 0;">
-                <button id="close-modal-btn" class="morph-back-btn">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <h2 id="modal-title" class="panel-title">Anno</h2>
+    <!-- Overlay (Blur) che non copre l'Header -->
+    <div id="modal-overlay" class="modal-backdrop hidden"></div>
+
+    <!-- Pannello Morphing (Parte fisicamente dal bottone) -->
+    <div id="modal-content" class="morph-panel hidden-morph">
+        <div class="panel-header" id="panel-header">
+            <!-- Il pallino si trasforma in questo bottone -->
+            <div id="morph-dot" class="morph-dot-element">
+                <i class="fas fa-chevron-left back-icon" id="back-icon"></i>
             </div>
-            
-            <div id="materie-grid" class="subjects-grid" style="opacity: 0;">
-                <!-- Materie iniettate dal JS -->
+            <h2 id="modal-title" class="panel-title">Anno</h2>
+        </div>
+        
+        <!-- Struttura divisa a metà per Materie e Materiale -->
+        <div id="split-view" class="split-view">
+            <div class="split-left" id="materie-list">
+                <!-- Materie generate via JS -->
+            </div>
+            <div class="split-right" id="risorse-list">
+                <div class="placeholder-text">Seleziona una materia per visualizzare il materiale</div>
             </div>
         </div>
     </div>
 
-    <!-- Il tuo JS -->
+    <!-- Collega l'app JS -->
     <script type="module" src="app.js"></script>
 </body>
 </html>
