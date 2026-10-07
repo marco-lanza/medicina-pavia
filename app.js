@@ -25,194 +25,184 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const analytics = getAnalytics(app);
 
-// --- LOGICA DEL SITO ---
-
-// Lettura del database per la materia specifica
-async function caricaMateria(nomeMateria) {
-  const docRef = doc(db, "materie", nomeMateria);
-  const docSnap = await getDoc(docRef);
-
-  if (docSnap.exists()) {
-    const dati = docSnap.data();
-    document.getElementById('titolo-materia').innerText = dati.titoloOriginale || nomeMateria;
-    
-    const contenitore = document.getElementById('lista-materiali');
-    contenitore.innerHTML = ''; 
-    
-    if (dati.risorse) {
-      dati.risorse.forEach(risorsa => {
-        if (risorsa.tipo === 'pdf') {
-          contenitore.innerHTML += `<a href="${risorsa.url}" target="_blank">${risorsa.nome}</a><br>`;
-        }
-        if (risorsa.tipo === 'quiz') {
-          contenitore.innerHTML += `<a href="${risorsa.url}">${risorsa.nome}</a><br>`;
-        }
-      });
-    }
-  } else {
-    document.getElementById('titolo-materia').innerText = "Materiale non ancora caricato";
-    document.getElementById('lista-materiali').innerHTML = '';
-  }
+:root {
+    --bg-base: #f5f5f7;
+    --text-main: #111827;
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --blob-1: #ffb4d6;
+    --blob-2: #c4d9ff;
+    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.05);
 }
 
-// Azione del bottone di Login
-document.getElementById('btn-login').addEventListener('click', () => {
-  const password = document.getElementById('pass-input').value;
-  // Sostituisci la mail con quella fittizia che creerai nel pannello di Firebase Auth
-  signInWithEmailAndPassword(auth, 'studenti@medicina.it', password)
-    .catch(error => alert('Password errata! Riprova.'));
-});
-
-// Ascoltatori degli eventi
-window.addEventListener('hashchange', gestisciRotta);
-window.addEventListener('load', gestisciRotta);
-
-
-
-// --- GESTIONE TEMA ---
-function applyTheme(theme) {
-    if(theme === 'dark') {
-        document.documentElement.classList.add('dark');
-        document.documentElement.classList.remove('light');
-    } else {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.classList.add('light');
-    }
-}
-let currentTheme = localStorage.getItem('appleTheme') || 'dark';
-applyTheme(currentTheme);
-
-window.toggleTheme = function() {
-    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-    localStorage.setItem('appleTheme', currentTheme);
-    applyTheme(currentTheme);
-};
-
-// --- FIX ROUTER: Nascondere e Mostrare le Sezioni (Sostituisci questo blocco) ---
-function mostraSchermata(idView) {
-    // Nasconde tutte le sezioni
-    const tutteLeView = document.querySelectorAll('.view-section');
-    tutteLeView.forEach(view => view.style.display = 'none');
-    
-    // Mostra solo quella richiesta
-    const viewDaMostrare = document.getElementById(idView);
-    if (viewDaMostrare) {
-        viewDaMostrare.style.display = 'flex'; // Usiamo flex per centrare i contenuti
-    }
+html.dark {
+    --bg-base: #000000;
+    --text-main: #f3f4f6;
+    --glass-bg: rgba(30, 30, 30, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --blob-1: #5c1435;
+    --blob-2: #142f5e;
+    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-// Simuliamo l'autenticazione per il test visivo (da collegare a Firebase come hai già fatto)
-window.addEventListener('hashchange', gestisciRotta);
-window.addEventListener('load', gestisciRotta);
-
-function gestisciRotta() {
-    const hash = window.location.hash;
-    // Se non c'è hash o è #/login, mostra il login. Altrimenti mostra gli anni.
-    if (hash === '' || hash === '#/login') {
-        mostraSchermata('view-login');
-    } else if (hash === '#/anni') {
-        mostraSchermata('view-anni');
-    }
-}
-// Per test, quando clicchi accedi vai alla pagina anni:
-document.getElementById('btn-login').addEventListener('click', () => {
-    window.location.hash = '#/anni';
-});
-
-
-// --- ANIMAZIONE MORPHING GEOMETRICA ---
-const modalOverlay = document.getElementById('modal-overlay');
-const morphPanel = document.getElementById('modal-content');
-const materieGrid = document.getElementById('materie-grid');
-const panelHeader = document.getElementById('panel-header');
-let activeRect = null; // Salva la posizione iniziale del bottone
-
-window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
-    document.getElementById('modal-title').innerText = nomeAnno;
-    
-    // 1. Calcola le coordinate esatte del bottone cliccato
-    activeRect = btnElement.getBoundingClientRect();
-    
-    // 2. Imposta il pannello esattamente sopra il bottone (nascosto)
-    morphPanel.style.transition = 'none';
-    morphPanel.style.top = activeRect.top + 'px';
-    morphPanel.style.left = activeRect.left + 'px';
-    morphPanel.style.width = activeRect.width + 'px';
-    morphPanel.style.height = activeRect.height + 'px';
-    morphPanel.style.borderRadius = '50px'; // Stessa curva della pillola
-    morphPanel.style.transform = 'translate(0, 0)';
-    
-    // Nasconde i testi interni per la transizione
-    panelHeader.style.opacity = '0';
-    materieGrid.style.opacity = '0';
-    
-    // Popola le materie
-    materieGrid.innerHTML = ''; 
-    let materie = idAnno === 'terzo-anno' ? [
-        { nome: 'Semeiotica Medica', css: 's-blue' },
-        { nome: 'Microbiologia', css: 's-red' },
-        { nome: 'Endocrinologia', css: 's-yellow' }
-    ] : [];
-    
-    materie.forEach(m => {
-        const div = document.createElement('div');
-        div.className = `subject-card ${m.css}`;
-        div.innerText = m.nome;
-        materieGrid.appendChild(div);
-    });
-
-    // 3. Rende visibile l'overlay e avvia l'animazione al frame successivo
-    modalOverlay.classList.remove('hidden');
-    
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            // Ripristina le transizioni CSS
-            morphPanel.style.transition = 'top 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), left 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), border-radius 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
-            
-            // Nuove coordinate per centrarlo ed espanderlo
-            morphPanel.style.top = '50%';
-            morphPanel.style.left = '50%';
-            morphPanel.style.width = '90%';
-            morphPanel.style.height = '70vh';
-            morphPanel.style.transform = 'translate(-50%, -50%)';
-            morphPanel.style.borderRadius = '36px'; // Diventa un rettangolo smussato
-            
-            // Fai apparire il contenuto dolcemente
-            setTimeout(() => {
-                panelHeader.style.opacity = '1';
-                materieGrid.style.opacity = '1';
-            }, 250);
-        });
-    });
-};
-
-// Logica per chiudere rimettendo il pannello al suo posto
-function chiudiPannello() {
-    if (!activeRect) return;
-    
-    // Nascondi i contenuti
-    panelHeader.style.opacity = '0';
-    materieGrid.style.opacity = '0';
-    
-    // Togli lo sfondo blurrato
-    modalOverlay.style.opacity = '0';
-    
-    // Riporta il pannello alle dimensioni del bottone originale
-    morphPanel.style.top = activeRect.top + 'px';
-    morphPanel.style.left = activeRect.left + 'px';
-    morphPanel.style.width = activeRect.width + 'px';
-    morphPanel.style.height = activeRect.height + 'px';
-    morphPanel.style.transform = 'translate(0, 0)';
-    morphPanel.style.borderRadius = '50px';
-    
-    // Dopo mezzo secondo (fine animazione), nascondi tutto completamente
-    setTimeout(() => {
-        modalOverlay.classList.add('hidden');
-        modalOverlay.style.opacity = ''; // reset per la prossima volta
-    }, 500);
+* {
+    box-sizing: border-box; margin: 0; padding: 0;
+    /* Usa il font Apple nativo senza chiamare API esterne */
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
-document.getElementById('close-modal-btn').addEventListener('click', chiudiPannello);
-modalOverlay.addEventListener('click', (e) => {
-    if (e.target === modalOverlay) chiudiPannello();
-});
+body {
+    background-color: var(--bg-base); color: var(--text-main);
+    transition: background-color 0.4s ease;
+    height: 100vh; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center;
+}
+
+/* --- SFONDO BLURATO (Attenuato) --- */
+.ambient-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: var(--bg-base); }
+.blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; transition: background 0.8s ease; }
+html.dark .blob { opacity: 0.25; }
+.blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--blob-1); }
+.blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: var(--blob-2); }
+
+/* --- COMPONENTI GLASS --- */
+.glass-panel, .glass-pill, .morph-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-main);
+}
+
+/* --- HEADER IN PRIMO PIANO --- */
+.top-header {
+    width: 90%; max-width: 600px; margin-top: 20px;
+    border-radius: 50px; padding: 15px 25px;
+    display: flex; justify-content: space-between; align-items: center;
+    position: relative; z-index: 100; /* Sopra a tutto, anche al blur */
+}
+.nav-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+
+.theme-toggle-container {
+    position: relative; width: 64px; height: 32px;
+    background: rgba(120, 120, 120, 0.2); border-radius: 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; padding: 3px;
+}
+.theme-slider {
+    position: absolute; top: 3px; left: 3px; width: 26px; height: 26px;
+    border-radius: 50%; background: white; z-index: 1;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+html.dark .theme-slider { background: #444; transform: translateX(32px); }
+.theme-icon { width: 26px; text-align: center; font-size: 13px; z-index: 2; pointer-events: none; }
+
+/* --- CONTENITORE CENTRALE --- */
+.app-main {
+    flex: 1; width: 100%; max-width: 800px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 10;
+}
+.view-section { width: 100%; display: flex; flex-direction: column; align-items: center; }
+
+/* --- LOGIN E BOTTONI ANNI --- */
+.login-panel { width: 90%; max-width: 360px; padding: 40px 30px; border-radius: 36px; text-align: center; }
+.login-panel h2 { font-size: 22px; margin-bottom: 20px; }
+.glass-input {
+    width: 100%; padding: 16px; border-radius: 16px; border: 1px solid var(--glass-border);
+    background: rgba(120,120,120,0.1); color: var(--text-main); font-weight: 600; outline: none; margin-bottom: 15px;
+}
+.glass-btn-solid { width: 100%; padding: 16px; border-radius: 16px; border: none; background: var(--text-main); color: var(--bg-base); font-weight: 700; cursor: pointer; }
+
+.years-container { gap: 14px; width: 90%; max-width: 360px; }
+.year-btn {
+    width: 100%; padding: 20px 25px; border-radius: 50px;
+    display: flex; align-items: center; cursor: pointer;
+    transition: background 0.3s;
+}
+.year-btn:hover { background: rgba(120,120,120,0.1); }
+.pill-dot { width: 12px; height: 12px; border-radius: 50%; background-color: var(--text-main); opacity: 0.3; margin-right: 18px; }
+.pill-text { font-size: 18px; font-weight: 600; color: var(--text-main); }
+
+/* --- MODAL E BLUR OVERLAY --- */
+.modal-backdrop {
+    position: fixed; top: 80px; left: 0; right: 0; bottom: 0; z-index: 50; /* Parte sotto l'header */
+    background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    transition: opacity 0.4s ease;
+}
+html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.5); }
+.modal-backdrop.hidden { opacity: 0; pointer-events: none; }
+
+/* --- IL PANNELLO MORPHING --- */
+.morph-panel {
+    position: absolute; overflow: hidden; z-index: 60;
+    /* La transizione è uniforme per evitare l'effetto più veloce a sinistra */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hidden-morph { opacity: 0; pointer-events: none; }
+
+/* --- L'HEADER INTERNO (Il testo e il pallino che si muovono) --- */
+.panel-header {
+    display: flex; align-items: center; padding: 20px 25px;
+    border-bottom: 1px solid transparent; transition: border-bottom 0.4s;
+}
+.morph-panel.expanded .panel-header { border-bottom: 1px solid var(--glass-border); padding: 25px 30px; }
+
+.morph-dot-element {
+    width: 12px; height: 12px; border-radius: 50%;
+    background-color: var(--text-main); opacity: 0.3; margin-right: 18px;
+    display: flex; justify-content: center; align-items: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+/* Quando il pannello è espanso, il pallino diventa un grosso bottone */
+.morph-panel.expanded .morph-dot-element {
+    width: 36px; height: 36px; opacity: 1;
+    background-color: rgba(120,120,120,0.2); margin-right: 15px;
+}
+.back-icon { font-size: 14px; color: var(--text-main); opacity: 0; transition: opacity 0.3s; }
+.morph-panel.expanded .back-icon { opacity: 1; }
+
+.panel-title { font-size: 18px; font-weight: 600; transition: font-size 0.4s; }
+.morph-panel.expanded .panel-title { font-size: 22px; font-weight: 700; }
+
+/* --- SPLIT VIEW (Sinistra/Destra) --- */
+.split-view {
+    display: flex; height: calc(100% - 87px); opacity: 0;
+    transition: opacity 0.3s ease; transition-delay: 0.1s;
+}
+.morph-panel.expanded .split-view { opacity: 1; }
+
+.split-left {
+    width: 40%; border-right: 1px solid var(--glass-border);
+    padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+}
+.split-right { width: 60%; padding: 20px; overflow-y: auto; }
+.placeholder-text { text-align: center; color: var(--text-muted); margin-top: 40px; font-weight: 600; }
+
+/* --- BOTTONI MATERIE PILL-SHAPED (Stile Calendario) --- */
+.subject-pill {
+    width: 100%; padding: 15px; border-radius: 20px;
+    font-size: 14px; font-weight: 700; text-align: left;
+    cursor: pointer; border: 1px solid transparent;
+    transition: transform 0.2s, opacity 0.2s;
+}
+.subject-pill:hover { transform: scale(1.02); }
+.subject-pill.active { border-color: var(--glass-border); opacity: 0.7; }
+
+/* Colori materie in stile calendario */
+.s-red { background: rgba(255, 59, 48, 0.18); color: #c91408; }
+.s-blue { background: rgba(0, 122, 255, 0.18); color: #005bb5; }
+.s-yellow { background: rgba(255, 204, 0, 0.18); color: #a38200; }
+html.dark .s-red { background: rgba(255, 59, 48, 0.25); color: #ff6b60; }
+html.dark .s-blue { background: rgba(0, 122, 255, 0.25); color: #4da6ff; }
+html.dark .s-yellow { background: rgba(255, 204, 0, 0.25); color: #ffe033; }
+
+/* --- STILE RISORSE --- */
+.resource-item {
+    display: block; padding: 15px; margin-bottom: 10px;
+    border-radius: 16px; background: rgba(120,120,120,0.1);
+    color: var(--text-main); font-weight: 600; text-decoration: none;
+    transition: background 0.2s;
+}
+.resource-item:hover { background: rgba(120,120,120,0.2); }
