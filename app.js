@@ -114,3 +114,74 @@ document.getElementById('btn-login').addEventListener('click', () => {
 // Ascoltatori degli eventi
 window.addEventListener('hashchange', gestisciRotta);
 window.addEventListener('load', gestisciRotta);
+
+
+
+// --- GESTIONE TEMA CHIARO/SCURO ---
+const themeToggle = document.getElementById('theme-toggle');
+let isDarkMode = false;
+
+themeToggle.addEventListener('click', () => {
+    isDarkMode = !isDarkMode;
+    if (isDarkMode) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeToggle.innerText = '☀️'; // Cambia icona
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        themeToggle.innerText = '🌙';
+    }
+});
+
+// --- GESTIONE PANNELLO MODALE (ANIMAZIONI) ---
+const modalOverlay = document.getElementById('modal-overlay');
+const closeModalBtn = document.getElementById('close-modal-btn');
+const modalTitle = document.getElementById('modal-title');
+const materieGrid = document.getElementById('materie-grid');
+
+// Funzione richiamata cliccando un anno (es. Primo Anno)
+window.apriPannelloAnno = function(nomeAnno, idAnno) {
+    modalTitle.innerText = nomeAnno; // L'anno diventa l'header
+    
+    // Svuota la griglia precedente
+    materieGrid.innerHTML = ''; 
+    
+    // Qui puoi definire le materie per ogni anno (con i loro colori stile calendario)
+    let materie = [];
+    if (idAnno === 'terzo-anno') {
+        materie = [
+            { id: 'semeiotica-medica', nome: 'Semeiotica Medica', colore: 'color-blue' },
+            { id: 'microbiologia', nome: 'Microbiologia', colore: 'color-red' },
+            { id: 'endocrinologia', nome: 'Endocrinologia', colore: 'color-yellow' }
+        ];
+    } else {
+        // Messaggio segnaposto se non ci sono materie configurate
+        materieGrid.innerHTML = '<p>Materie in aggiornamento...</p>';
+    }
+
+    // Crea i quadratini colorati per le materie
+    materie.forEach(materia => {
+        const box = document.createElement('div');
+        box.className = `subject-box ${materia.colore}`;
+        box.innerText = materia.nome;
+        box.onclick = () => {
+            window.location.hash = `#/materia/${materia.id}`;
+            modalOverlay.classList.add('hidden'); // Chiude il modale e va alla pagina della materia
+        };
+        materieGrid.appendChild(box);
+    });
+
+    // Mostra il pannello con animazione
+    modalOverlay.classList.remove('hidden');
+};
+
+// Chiudi il pannello cliccando la freccia "<"
+closeModalBtn.addEventListener('click', () => {
+    modalOverlay.classList.add('hidden');
+});
+
+// Chiudi il pannello cliccando sullo sfondo sfocato (fuori dal contenuto)
+modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+        modalOverlay.classList.add('hidden');
+    }
+});
