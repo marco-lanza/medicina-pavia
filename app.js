@@ -1,208 +1,201 @@
-// 1. Importiamo le funzioni esatte che ci servono da Firebase
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+// --- IMPORT FIREBASE (Versione 10.13.1 unificata) ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// 2. DATI DELLA TUA CONFIGURAZIONE (presi da Firebase)  
+// Sostituisci con la tua configurazione
 const firebaseConfig = {
-    apiKey: "AIzaSyBOct9DJUuDIFWPEXnpqiuH2gS7_eDkqHY",
-    authDomain: "medicina-pavia.firebaseapp.com",
-    projectId: "medicina-pavia",
-    storageBucket: "medicina-pavia.firebasestorage.app",
-    messagingSenderId: "371700150654",
-    appId: "1:371700150654:web:fcd524be165f9fccb3c32f",
-    measurementId: "G-BTMDMC3ZEN"
-  };
+    apiKey: "LA_TUA_API_KEY",
+    authDomain: "IL_TUO_DOMAIN",
+    projectId: "IL_TUO_PROJECT_ID",
+};
 
-// 3. Inizializziamo l'app, l'autenticazione e il database
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const analytics = getAnalytics(app);
 
-:root {
-    --bg-base: #f5f5f7;
-    --text-main: #111827;
-    --glass-bg: rgba(255, 255, 255, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.8);
-    --blob-1: #ffb4d6;
-    --blob-2: #c4d9ff;
-    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.05);
+// --- GESTIONE TEMA ---
+function applyTheme(theme) {
+    if(theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+    } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+    }
+}
+let currentTheme = localStorage.getItem('appleTheme') || 'dark';
+applyTheme(currentTheme);
+
+window.toggleTheme = function() {
+    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+    localStorage.setItem('appleTheme', currentTheme);
+    applyTheme(currentTheme);
+};
+
+// --- ROUTER E SICUREZZA (La password serve davvero) ---
+function mostraSchermata(idView) {
+    document.querySelectorAll('.view-section').forEach(view => view.style.display = 'none');
+    const viewDaMostrare = document.getElementById(idView);
+    if (viewDaMostrare) viewDaMostrare.style.display = 'flex';
 }
 
-html.dark {
-    --bg-base: #000000;
-    --text-main: #f3f4f6;
-    --glass-bg: rgba(30, 30, 30, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --blob-1: #5c1435;
-    --blob-2: #142f5e;
-    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.4);
+function gestisciRotta() {
+    const hash = window.location.hash || '#/anni';
+    
+    // Controlla il vero stato di Firebase Auth
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            // Se NON è loggato, blocca l'accesso e rimanda al login
+            if (hash !== '#/login') {
+                sessionStorage.setItem('urlDesiderato', hash);
+                window.location.replace('#/login');
+            }
+            mostraSchermata('view-login');
+        } else {
+            // Se È loggato, permette la navigazione
+            if (hash === '#/login') {
+                window.location.replace(sessionStorage.getItem('urlDesiderato') || '#/anni');
+            } else {
+                mostraSchermata('view-anni');
+            }
+        }
+    });
 }
 
-* {
-    box-sizing: border-box; margin: 0; padding: 0;
-    /* Usa il font Apple nativo senza chiamare API esterne */
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-    -webkit-font-smoothing: antialiased;
+// Evento Login tramite Firebase
+document.getElementById('btn-login').addEventListener('click', () => {
+    const password = document.getElementById('pass-input').value;
+    signInWithEmailAndPassword(auth, 'studenti@medicina.it', password)
+        .catch(error => alert('Password errata. Riprova.'));
+});
+
+window.addEventListener('hashchange', gestisciRotta);
+window.addEventListener('load', gestisciRotta);
+
+
+// --- ANIMAZIONE MORPHING FLUIDA E SPLIT VIEW ---
+const modalOverlay = document.getElementById('modal-overlay');
+const morphPanel = document.getElementById('modal-content');
+const materieList = document.getElementById('materie-list');
+const risorseList = document.getElementById('risorse-list');
+let originalRect = null;
+
+window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
+    document.getElementById('modal-title').innerText = nomeAnno;
+    
+    // 1. Calcola posizione esatta del bottone
+    originalRect = btnElement.getBoundingClientRect();
+    
+    // 2. Piazza il pannello invisibile esattamente sopra il bottone
+    morphPanel.style.transition = 'none';
+    morphPanel.classList.remove('hidden-morph', 'expanded');
+    morphPanel.style.top = originalRect.top + 'px';
+    morphPanel.style.left = originalRect.left + 'px';
+    morphPanel.style.width = originalRect.width + 'px';
+    morphPanel.style.height = originalRect.height + 'px';
+    morphPanel.style.borderRadius = '50px';
+    
+    // Pulisce le viste
+    materieList.innerHTML = '';
+    risorseList.innerHTML = '<div class="placeholder-text">Seleziona una materia per visualizzare il materiale</div>';
+
+    // 3. Genera la lista materie (Esempio per il terzo anno)
+    let materie = [];
+    if (idAnno === 'terzo-anno') {
+        materie = [
+            { id: 'semeiotica-medica', nome: 'Semeiotica Medica', css: 's-blue' },
+            { id: 'microbiologia', nome: 'Microbiologia', css: 's-red' },
+            { id: 'endocrinologia', nome: 'Endocrinologia', css: 's-yellow' }
+        ];
+    }
+
+    materie.forEach(m => {
+        const pill = document.createElement('div');
+        pill.className = `subject-pill ${m.css}`;
+        pill.innerText = m.nome;
+        pill.onclick = () => {
+            // Rimuovi 'active' dalle altre
+            document.querySelectorAll('.subject-pill').forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            caricaMateriale(m.id); // Chiama il DB per le risorse
+        };
+        materieList.appendChild(pill);
+    });
+
+    // 4. Avvia il morphing
+    modalOverlay.classList.remove('hidden');
+    
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            // Applica transizione e nuove dimensioni centrali limitate in altezza
+            morphPanel.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            morphPanel.style.width = '90%';
+            morphPanel.style.maxWidth = '800px';
+            morphPanel.style.height = '70vh'; // Non diventa troppo alto
+            morphPanel.style.maxHeight = '600px';
+            
+            // Centratura calcolata
+            morphPanel.style.top = 'calc(50% + 40px)'; 
+            morphPanel.style.left = '50%';
+            morphPanel.style.transform = 'translate(-50%, -50%)';
+            morphPanel.style.borderRadius = '36px';
+            
+            morphPanel.classList.add('expanded');
+        });
+    });
+};
+
+// Carica il contenuto della colonna destra leggendo da Firebase
+async function caricaMateriale(idMateria) {
+    risorseList.innerHTML = '<div class="placeholder-text">Caricamento in corso...</div>';
+    
+    try {
+        const docRef = doc(db, "materie", idMateria);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const dati = docSnap.data();
+            risorseList.innerHTML = `<h3>${dati.titoloOriginale || 'Materiale'}</h3><br>`;
+            
+            if (dati.risorse && dati.risorse.length > 0) {
+                dati.risorse.forEach(r => {
+                    risorseList.innerHTML += `<a href="${r.url}" target="_blank" class="resource-item"><i class="fas fa-file-alt"></i> ${r.nome}</a>`;
+                });
+            } else {
+                risorseList.innerHTML += '<p>Nessun materiale caricato.</p>';
+            }
+        } else {
+            // Fallback locale se non c'è DB per mostrare il funzionamento
+            risorseList.innerHTML = `
+                <a href="#" class="resource-item"><i class="fas fa-file-pdf"></i> Appunti di ${idMateria} (PDF)</a>
+                <a href="#" class="resource-item"><i class="fas fa-check-circle"></i> Quiz Interattivo</a>
+            `;
+        }
+    } catch(e) {
+        risorseList.innerHTML = '<div class="placeholder-text">Errore di connessione al database. Mostro dati di esempio.</div>';
+    }
 }
 
-body {
-    background-color: var(--bg-base); color: var(--text-main);
-    transition: background-color 0.4s ease;
-    height: 100vh; overflow: hidden;
-    display: flex; flex-direction: column; align-items: center;
-}
+// Chiusura con reverse-morphing
+document.getElementById('morph-dot').addEventListener('click', chiudiPannello);
+modalOverlay.addEventListener('click', chiudiPannello);
 
-/* --- SFONDO BLURATO (Attenuato) --- */
-.ambient-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: var(--bg-base); }
-.blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; transition: background 0.8s ease; }
-html.dark .blob { opacity: 0.25; }
-.blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--blob-1); }
-.blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: var(--blob-2); }
-
-/* --- COMPONENTI GLASS --- */
-.glass-panel, .glass-pill, .morph-panel {
-    background: var(--glass-bg);
-    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-main);
+function chiudiPannello() {
+    if (!originalRect) return;
+    
+    modalOverlay.classList.add('hidden');
+    morphPanel.classList.remove('expanded');
+    
+    // Torna alla posizione e forma del bottone originale
+    morphPanel.style.top = originalRect.top + 'px';
+    morphPanel.style.left = originalRect.left + 'px';
+    morphPanel.style.width = originalRect.width + 'px';
+    morphPanel.style.height = originalRect.height + 'px';
+    morphPanel.style.transform = 'translate(0, 0)';
+    morphPanel.style.borderRadius = '50px';
+    
+    setTimeout(() => {
+        morphPanel.classList.add('hidden-morph');
+    }, 400);
 }
-
-/* --- HEADER IN PRIMO PIANO --- */
-.top-header {
-    width: 90%; max-width: 600px; margin-top: 20px;
-    border-radius: 50px; padding: 15px 25px;
-    display: flex; justify-content: space-between; align-items: center;
-    position: relative; z-index: 100; /* Sopra a tutto, anche al blur */
-}
-.nav-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
-
-.theme-toggle-container {
-    position: relative; width: 64px; height: 32px;
-    background: rgba(120, 120, 120, 0.2); border-radius: 32px;
-    display: flex; align-items: center; justify-content: space-between;
-    cursor: pointer; padding: 3px;
-}
-.theme-slider {
-    position: absolute; top: 3px; left: 3px; width: 26px; height: 26px;
-    border-radius: 50%; background: white; z-index: 1;
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-}
-html.dark .theme-slider { background: #444; transform: translateX(32px); }
-.theme-icon { width: 26px; text-align: center; font-size: 13px; z-index: 2; pointer-events: none; }
-
-/* --- CONTENITORE CENTRALE --- */
-.app-main {
-    flex: 1; width: 100%; max-width: 800px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    z-index: 10;
-}
-.view-section { width: 100%; display: flex; flex-direction: column; align-items: center; }
-
-/* --- LOGIN E BOTTONI ANNI --- */
-.login-panel { width: 90%; max-width: 360px; padding: 40px 30px; border-radius: 36px; text-align: center; }
-.login-panel h2 { font-size: 22px; margin-bottom: 20px; }
-.glass-input {
-    width: 100%; padding: 16px; border-radius: 16px; border: 1px solid var(--glass-border);
-    background: rgba(120,120,120,0.1); color: var(--text-main); font-weight: 600; outline: none; margin-bottom: 15px;
-}
-.glass-btn-solid { width: 100%; padding: 16px; border-radius: 16px; border: none; background: var(--text-main); color: var(--bg-base); font-weight: 700; cursor: pointer; }
-
-.years-container { gap: 14px; width: 90%; max-width: 360px; }
-.year-btn {
-    width: 100%; padding: 20px 25px; border-radius: 50px;
-    display: flex; align-items: center; cursor: pointer;
-    transition: background 0.3s;
-}
-.year-btn:hover { background: rgba(120,120,120,0.1); }
-.pill-dot { width: 12px; height: 12px; border-radius: 50%; background-color: var(--text-main); opacity: 0.3; margin-right: 18px; }
-.pill-text { font-size: 18px; font-weight: 600; color: var(--text-main); }
-
-/* --- MODAL E BLUR OVERLAY --- */
-.modal-backdrop {
-    position: fixed; top: 80px; left: 0; right: 0; bottom: 0; z-index: 50; /* Parte sotto l'header */
-    background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-    transition: opacity 0.4s ease;
-}
-html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.5); }
-.modal-backdrop.hidden { opacity: 0; pointer-events: none; }
-
-/* --- IL PANNELLO MORPHING --- */
-.morph-panel {
-    position: absolute; overflow: hidden; z-index: 60;
-    /* La transizione è uniforme per evitare l'effetto più veloce a sinistra */
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.hidden-morph { opacity: 0; pointer-events: none; }
-
-/* --- L'HEADER INTERNO (Il testo e il pallino che si muovono) --- */
-.panel-header {
-    display: flex; align-items: center; padding: 20px 25px;
-    border-bottom: 1px solid transparent; transition: border-bottom 0.4s;
-}
-.morph-panel.expanded .panel-header { border-bottom: 1px solid var(--glass-border); padding: 25px 30px; }
-
-.morph-dot-element {
-    width: 12px; height: 12px; border-radius: 50%;
-    background-color: var(--text-main); opacity: 0.3; margin-right: 18px;
-    display: flex; justify-content: center; align-items: center;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-}
-/* Quando il pannello è espanso, il pallino diventa un grosso bottone */
-.morph-panel.expanded .morph-dot-element {
-    width: 36px; height: 36px; opacity: 1;
-    background-color: rgba(120,120,120,0.2); margin-right: 15px;
-}
-.back-icon { font-size: 14px; color: var(--text-main); opacity: 0; transition: opacity 0.3s; }
-.morph-panel.expanded .back-icon { opacity: 1; }
-
-.panel-title { font-size: 18px; font-weight: 600; transition: font-size 0.4s; }
-.morph-panel.expanded .panel-title { font-size: 22px; font-weight: 700; }
-
-/* --- SPLIT VIEW (Sinistra/Destra) --- */
-.split-view {
-    display: flex; height: calc(100% - 87px); opacity: 0;
-    transition: opacity 0.3s ease; transition-delay: 0.1s;
-}
-.morph-panel.expanded .split-view { opacity: 1; }
-
-.split-left {
-    width: 40%; border-right: 1px solid var(--glass-border);
-    padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
-}
-.split-right { width: 60%; padding: 20px; overflow-y: auto; }
-.placeholder-text { text-align: center; color: var(--text-muted); margin-top: 40px; font-weight: 600; }
-
-/* --- BOTTONI MATERIE PILL-SHAPED (Stile Calendario) --- */
-.subject-pill {
-    width: 100%; padding: 15px; border-radius: 20px;
-    font-size: 14px; font-weight: 700; text-align: left;
-    cursor: pointer; border: 1px solid transparent;
-    transition: transform 0.2s, opacity 0.2s;
-}
-.subject-pill:hover { transform: scale(1.02); }
-.subject-pill.active { border-color: var(--glass-border); opacity: 0.7; }
-
-/* Colori materie in stile calendario */
-.s-red { background: rgba(255, 59, 48, 0.18); color: #c91408; }
-.s-blue { background: rgba(0, 122, 255, 0.18); color: #005bb5; }
-.s-yellow { background: rgba(255, 204, 0, 0.18); color: #a38200; }
-html.dark .s-red { background: rgba(255, 59, 48, 0.25); color: #ff6b60; }
-html.dark .s-blue { background: rgba(0, 122, 255, 0.25); color: #4da6ff; }
-html.dark .s-yellow { background: rgba(255, 204, 0, 0.25); color: #ffe033; }
-
-/* --- STILE RISORSE --- */
-.resource-item {
-    display: block; padding: 15px; margin-bottom: 10px;
-    border-radius: 16px; background: rgba(120,120,120,0.1);
-    color: var(--text-main); font-weight: 600; text-decoration: none;
-    transition: background 0.2s;
-}
-.resource-item:hover { background: rgba(120,120,120,0.2); }
