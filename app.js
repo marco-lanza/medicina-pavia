@@ -127,8 +127,6 @@ function applyTheme(theme) {
         document.documentElement.classList.add('light');
     }
 }
-
-// Inizializza il tema basandosi sul salvataggio o impostalo dark di default
 let currentTheme = localStorage.getItem('appleTheme') || 'dark';
 applyTheme(currentTheme);
 
@@ -138,51 +136,131 @@ window.toggleTheme = function() {
     applyTheme(currentTheme);
 };
 
-
-// --- GESTIONE PANNELLO ESPANSO ---
-const modalOverlay = document.getElementById('modal-overlay');
-const materieGrid = document.getElementById('materie-grid');
-const modalTitle = document.getElementById('modal-title');
-const closeBtn = document.getElementById('close-modal-btn');
-
-window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
-    modalTitle.innerText = nomeAnno;
-    materieGrid.innerHTML = ''; 
-
-    // Dati delle materie (esempi usando i colori estratti)
-    let materie = [];
-    if (idAnno === 'terzo-anno') {
-        materie = [
-            { id: 'semeiotica-medica', nome: 'Semeiotica Medica', css: 's-blue' },
-            { id: 'microbiologia', nome: 'Microbiologia', css: 's-red' },
-            { id: 'endocrinologia', nome: 'Endocrinologia', css: 's-yellow' }
-        ];
-    } else {
-        materieGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; opacity:0.5;">In aggiornamento...</p>';
+// --- FIX ROUTER: Nascondere e Mostrare le Sezioni (Sostituisci questo blocco) ---
+function mostraSchermata(idView) {
+    // Nasconde tutte le sezioni
+    const tutteLeView = document.querySelectorAll('.view-section');
+    tutteLeView.forEach(view => view.style.display = 'none');
+    
+    // Mostra solo quella richiesta
+    const viewDaMostrare = document.getElementById(idView);
+    if (viewDaMostrare) {
+        viewDaMostrare.style.display = 'flex'; // Usiamo flex per centrare i contenuti
     }
+}
 
-    materie.forEach(materia => {
-        const box = document.createElement('div');
-        box.className = `subject-card ${materia.css}`;
-        box.innerText = materia.nome;
-        box.onclick = () => {
-            window.location.hash = `#/materia/${materia.id}`;
-            modalOverlay.classList.add('hidden'); 
-        };
-        materieGrid.appendChild(box);
-    });
+// Simuliamo l'autenticazione per il test visivo (da collegare a Firebase come hai già fatto)
+window.addEventListener('hashchange', gestisciRotta);
+window.addEventListener('load', gestisciRotta);
 
-    // Rimuove l'hidden per far partire la transizione CSS scale/opacity
-    modalOverlay.classList.remove('hidden');
-};
-
-// Chiusura fluida
-closeBtn.addEventListener('click', () => {
-    modalOverlay.classList.add('hidden');
+function gestisciRotta() {
+    const hash = window.location.hash;
+    // Se non c'è hash o è #/login, mostra il login. Altrimenti mostra gli anni.
+    if (hash === '' || hash === '#/login') {
+        mostraSchermata('view-login');
+    } else if (hash === '#/anni') {
+        mostraSchermata('view-anni');
+    }
+}
+// Per test, quando clicchi accedi vai alla pagina anni:
+document.getElementById('btn-login').addEventListener('click', () => {
+    window.location.hash = '#/anni';
 });
 
-modalOverlay.addEventListener('click', (e) => {
-    if (e.target === modalOverlay) {
+
+// --- ANIMAZIONE MORPHING GEOMETRICA ---
+const modalOverlay = document.getElementById('modal-overlay');
+const morphPanel = document.getElementById('modal-content');
+const materieGrid = document.getElementById('materie-grid');
+const panelHeader = document.getElementById('panel-header');
+let activeRect = null; // Salva la posizione iniziale del bottone
+
+window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
+    document.getElementById('modal-title').innerText = nomeAnno;
+    
+    // 1. Calcola le coordinate esatte del bottone cliccato
+    activeRect = btnElement.getBoundingClientRect();
+    
+    // 2. Imposta il pannello esattamente sopra il bottone (nascosto)
+    morphPanel.style.transition = 'none';
+    morphPanel.style.top = activeRect.top + 'px';
+    morphPanel.style.left = activeRect.left + 'px';
+    morphPanel.style.width = activeRect.width + 'px';
+    morphPanel.style.height = activeRect.height + 'px';
+    morphPanel.style.borderRadius = '50px'; // Stessa curva della pillola
+    morphPanel.style.transform = 'translate(0, 0)';
+    
+    // Nasconde i testi interni per la transizione
+    panelHeader.style.opacity = '0';
+    materieGrid.style.opacity = '0';
+    
+    // Popola le materie
+    materieGrid.innerHTML = ''; 
+    let materie = idAnno === 'terzo-anno' ? [
+        { nome: 'Semeiotica Medica', css: 's-blue' },
+        { nome: 'Microbiologia', css: 's-red' },
+        { nome: 'Endocrinologia', css: 's-yellow' }
+    ] : [];
+    
+    materie.forEach(m => {
+        const div = document.createElement('div');
+        div.className = `subject-card ${m.css}`;
+        div.innerText = m.nome;
+        materieGrid.appendChild(div);
+    });
+
+    // 3. Rende visibile l'overlay e avvia l'animazione al frame successivo
+    modalOverlay.classList.remove('hidden');
+    
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            // Ripristina le transizioni CSS
+            morphPanel.style.transition = 'top 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), left 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), border-radius 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            
+            // Nuove coordinate per centrarlo ed espanderlo
+            morphPanel.style.top = '50%';
+            morphPanel.style.left = '50%';
+            morphPanel.style.width = '90%';
+            morphPanel.style.height = '70vh';
+            morphPanel.style.transform = 'translate(-50%, -50%)';
+            morphPanel.style.borderRadius = '36px'; // Diventa un rettangolo smussato
+            
+            // Fai apparire il contenuto dolcemente
+            setTimeout(() => {
+                panelHeader.style.opacity = '1';
+                materieGrid.style.opacity = '1';
+            }, 250);
+        });
+    });
+};
+
+// Logica per chiudere rimettendo il pannello al suo posto
+function chiudiPannello() {
+    if (!activeRect) return;
+    
+    // Nascondi i contenuti
+    panelHeader.style.opacity = '0';
+    materieGrid.style.opacity = '0';
+    
+    // Togli lo sfondo blurrato
+    modalOverlay.style.opacity = '0';
+    
+    // Riporta il pannello alle dimensioni del bottone originale
+    morphPanel.style.top = activeRect.top + 'px';
+    morphPanel.style.left = activeRect.left + 'px';
+    morphPanel.style.width = activeRect.width + 'px';
+    morphPanel.style.height = activeRect.height + 'px';
+    morphPanel.style.transform = 'translate(0, 0)';
+    morphPanel.style.borderRadius = '50px';
+    
+    // Dopo mezzo secondo (fine animazione), nascondi tutto completamente
+    setTimeout(() => {
         modalOverlay.classList.add('hidden');
-    }
+        modalOverlay.style.opacity = ''; // reset per la prossima volta
+    }, 500);
+}
+
+document.getElementById('close-modal-btn').addEventListener('click', chiudiPannello);
+modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) chiudiPannello();
 });
