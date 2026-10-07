@@ -1,233 +1,227 @@
-/* Variabili CSS per la gestione del Tema Chiaro/Scuro assoluto */
+/* Variabili globali identiche al tuo Calendario */
 :root {
-    --bg-color: #f3f4f6;
-    --text-color: #1c1c1e;
-    --glass-bg: rgba(255, 255, 255, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.4);
-    --overlay-bg: rgba(255, 255, 255, 0.3);
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    --bg-body: #f5f5f7;
+    --text-main: #111827;
+    --text-muted: #6b7280;
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --element-bg: rgba(0, 0, 0, 0.05);
+    --element-hover: rgba(0, 0, 0, 0.1);
+    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --accent: #007aff;
 }
 
-[data-theme="dark"] {
-    --bg-color: #000000;
-    --text-color: #ffffff;
-    --glass-bg: rgba(30, 30, 30, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --overlay-bg: rgba(0, 0, 0, 0.5);
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+html.dark {
+    --bg-body: #000000;
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --glass-bg: rgba(18, 18, 18, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --element-bg: rgba(255, 255, 255, 0.1);
+    --element-hover: rgba(255, 255, 255, 0.2);
+    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    background-color: var(--bg-body);
+    color: var(--text-main);
     transition: background-color 0.4s ease, color 0.4s ease;
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow: hidden;
 }
 
-/* Header in alto */
-.glass-header {
-    width: 90%;
-    max-width: 600px;
-    margin-top: 20px;
-    padding: 15px 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 50px; /* Stile pillola anche per l'header */
-    box-shadow: var(--shadow);
+/* --- HEADER E TOGGLE --- */
+.top-nav {
+    width: 100%; max-width: 600px;
+    padding: 20px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 10;
 }
 
-#app-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-top: 40px;
+.nav-title {
+    font-size: 24px; font-weight: 700;
+    letter-spacing: -0.5px;
 }
 
-/* Stile base dei pannelli Glass */
+.theme-toggle-container {
+    position: relative; width: 72px; height: 36px;
+    background: var(--element-bg); border-radius: 36px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px; cursor: pointer; transition: background 0.3s;
+}
+
+.theme-slider {
+    position: absolute; top: 4px; left: 4px;
+    width: 28px; height: 28px;
+    background: white; border-radius: 50%;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+html.dark .theme-slider {
+    background: #333; transform: translateX(36px);
+}
+
+.theme-icon {
+    width: 28px; text-align: center;
+    font-size: 14px; color: var(--text-muted);
+}
+html.dark .theme-icon .fa-moon { color: white; }
+html:not(.dark) .theme-icon .fa-sun { color: #f59e0b; }
+
+/* --- CONTENITORE CENTRALE --- */
+.app-main {
+    flex: 1; width: 100%; max-width: 800px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 20px;
+}
+
+/* --- STILE GLASS CONDIVISO --- */
 .glass-panel {
     background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
     border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-    padding: 30px;
+    box-shadow: var(--shadow-main);
 }
 
-/* Bottoni Pill-Shaped degli Anni */
-.years-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 90%;
-    max-width: 400px;
+/* --- LOGIN --- */
+.login-panel {
+    width: 100%; max-width: 360px;
+    padding: 40px 30px; border-radius: 36px;
+    text-align: center;
+}
+.login-panel h2 { font-size: 22px; font-weight: 700; margin-bottom: 5px; }
+.subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; }
+
+.apple-input {
+    width: 100%; padding: 16px 20px;
+    border-radius: 18px; border: 1px solid transparent;
+    background: var(--element-bg); color: var(--text-main);
+    font-size: 16px; font-weight: 600; outline: none;
+    transition: border 0.3s; margin-bottom: 15px;
+}
+.apple-input:focus { border-color: var(--text-muted); }
+
+.apple-btn-solid {
+    width: 100%; padding: 16px; border-radius: 18px; border: none;
+    background: var(--text-main); color: var(--bg-body);
+    font-size: 16px; font-weight: 700; cursor: pointer;
+    transition: transform 0.2s;
+}
+.apple-btn-solid:active { transform: scale(0.97); }
+
+/* --- PILLOLE DEGLI ANNI --- */
+.years-container {
+    width: 100%; max-width: 340px; /* Larghezza fissa ed elegante */
+    display: flex; flex-direction: column; gap: 12px;
 }
 
 .year-pill {
+    width: 100%; padding: 18px 24px;
     background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 50px;
-    padding: 20px 30px;
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--text-color);
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: var(--shadow);
-    transition: transform 0.2s ease, background 0.3s ease;
+    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+    border: 1px solid var(--glass-border); border-radius: 50px;
+    display: flex; align-items: center;
+    cursor: pointer; box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
+.year-pill:hover { background: var(--element-bg); transform: scale(1.02); }
+.year-pill:active { transform: scale(0.98); }
 
-.year-pill:hover {
-    transform: scale(1.02);
-    background: rgba(120, 120, 120, 0.1);
+.pill-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background-color: var(--text-main); opacity: 0.2;
+    margin-right: 16px; transition: all 0.4s ease;
 }
+html.dark .pill-dot { opacity: 0.4; background-color: white; }
+.pill-text { font-size: 18px; font-weight: 600; color: var(--text-main); }
 
-/* Pallino a sinistra del testo */
-.dot {
-    width: 12px;
-    height: 12px;
-    background-color: var(--text-color);
-    border-radius: 50%;
-    margin-right: 15px;
-    opacity: 0.7;
+/* --- ANIMAZIONE E PANNELLO ESPANSO --- */
+.modal-backdrop {
+    position: fixed; inset: 0; z-index: 50;
+    display: flex; justify-content: center; align-items: center;
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    opacity: 1; transition: opacity 0.4s ease;
 }
+html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.5); }
+.modal-backdrop.hidden { opacity: 0; pointer-events: none; }
 
-/* Modal Overlay (Sfondo sfocato che chiude al click) */
-.overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: var(--overlay-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-}
-
-.overlay.hidden {
+.expanded-panel {
+    width: 90%; max-width: 600px;
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+    border-radius: 36px; padding: 24px;
+    box-shadow: var(--shadow-main);
+    
+    /* Il trucco dell'animazione: parte stretto e arrotondato, poi si espande */
+    transform: scale(0.85) translateY(20px);
     opacity: 0;
-    pointer-events: none;
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); /* Curva super morbida Apple */
 }
 
-/* Contenuto del Modal animato */
-.modal-content {
-    width: 90%;
-    max-width: 600px;
-    max-height: 80vh;
-    overflow-y: auto;
-    transform: scale(1);
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+.modal-backdrop:not(.hidden) .expanded-panel {
+    transform: scale(1) translateY(0);
+    opacity: 1;
 }
 
-.overlay.hidden .modal-content {
-    transform: scale(0.8);
-}
-
-/* Header del Modal con Freccia e Titolo */
-.modal-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 25px;
+/* Header del pannello espanso */
+.panel-header {
+    display: flex; align-items: center;
+    margin-bottom: 24px; padding-bottom: 16px;
     border-bottom: 1px solid var(--glass-border);
-    padding-bottom: 15px;
 }
 
-.back-arrow-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    font-weight: bold;
-    color: var(--text-color);
-    margin-right: 15px;
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(120,120,120,0.1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* Il bottone indietro nato dal pallino */
+.morph-back-btn {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: var(--element-bg); color: var(--text-main);
+    display: flex; justify-content: center; align-items: center;
+    margin-right: 16px; cursor: pointer; font-size: 14px;
+    transition: background 0.2s, transform 0.2s;
+}
+.morph-back-btn:hover { background: var(--element-hover); transform: scale(1.05); }
+
+.panel-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+
+/* Griglia delle materie satinata */
+.subjects-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
 }
 
-/* Griglia per le materie */
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 15px;
+.subject-card {
+    aspect-ratio: 1; border-radius: 24px; padding: 16px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: transform 0.2s;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-sm); border: 1px solid var(--glass-border);
 }
+.subject-card:hover { transform: scale(1.03); }
 
-/* Box materie (ispirate agli eventi del calendario) */
-.subject-box {
-    border-radius: 16px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    font-weight: 600;
-    color: var(--text-color);
-    cursor: pointer;
-    aspect-ratio: 1; /* Rende i box quadrati */
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
-    transition: transform 0.2s;
-}
+/* Colori materie prelevati dal tuo calendario */
+.s-red { background: rgba(255, 59, 48, 0.18); color: #c91408; }
+.s-blue { background: rgba(0, 122, 255, 0.18); color: #005bb5; }
+.s-green { background: rgba(52, 199, 89, 0.18); color: #248a3d; }
+.s-yellow { background: rgba(255, 204, 0, 0.18); color: #a38200; }
+.s-purple { background: rgba(175, 82, 222, 0.18); color: #7b31a3; }
 
-.subject-box:hover {
-    transform: scale(1.05);
-}
-
-/* Esempi di colori glassati per le materie */
-.color-red { background: rgba(255, 59, 48, 0.2); }
-.color-blue { background: rgba(0, 122, 255, 0.2); }
-.color-green { background: rgba(52, 199, 89, 0.2); }
-.color-yellow { background: rgba(255, 204, 0, 0.2); }
-.color-purple { background: rgba(175, 82, 222, 0.2); }
-
-/* Input e bottoni generici */
-.glass-input, .glass-btn {
-    width: 100%;
-    padding: 15px;
-    margin-top: 15px;
-    border-radius: 12px;
-    border: 1px solid var(--glass-border);
-    background: rgba(120, 120, 120, 0.1);
-    color: var(--text-color);
-    font-size: 16px;
-}
-
-.glass-btn {
-    background: var(--text-color);
-    color: var(--bg-color);
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.glass-icon-btn {
-    background: transparent;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-}
+html.dark .s-red { background: rgba(255, 59, 48, 0.25); color: #ff6b60; }
+html.dark .s-blue { background: rgba(0, 122, 255, 0.25); color: #4da6ff; }
+html.dark .s-green { background: rgba(52, 199, 89, 0.25); color: #5ddb80; }
+html.dark .s-yellow { background: rgba(255, 204, 0, 0.25); color: #ffe033; }
+html.dark .s-purple { background: rgba(175, 82, 222, 0.25); color: #c985f0; }
