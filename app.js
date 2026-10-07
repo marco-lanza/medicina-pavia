@@ -117,69 +117,70 @@ window.addEventListener('load', gestisciRotta);
 
 
 
-// --- GESTIONE TEMA CHIARO/SCURO ---
-const themeToggle = document.getElementById('theme-toggle');
-let isDarkMode = false;
-
-themeToggle.addEventListener('click', () => {
-    isDarkMode = !isDarkMode;
-    if (isDarkMode) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        themeToggle.innerText = '☀️'; // Cambia icona
+// --- GESTIONE TEMA ---
+function applyTheme(theme) {
+    if(theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
     } else {
-        document.documentElement.removeAttribute('data-theme');
-        themeToggle.innerText = '🌙';
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
     }
-});
+}
 
-// --- GESTIONE PANNELLO MODALE (ANIMAZIONI) ---
+// Inizializza il tema basandosi sul salvataggio o impostalo dark di default
+let currentTheme = localStorage.getItem('appleTheme') || 'dark';
+applyTheme(currentTheme);
+
+window.toggleTheme = function() {
+    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+    localStorage.setItem('appleTheme', currentTheme);
+    applyTheme(currentTheme);
+};
+
+
+// --- GESTIONE PANNELLO ESPANSO ---
 const modalOverlay = document.getElementById('modal-overlay');
-const closeModalBtn = document.getElementById('close-modal-btn');
-const modalTitle = document.getElementById('modal-title');
 const materieGrid = document.getElementById('materie-grid');
+const modalTitle = document.getElementById('modal-title');
+const closeBtn = document.getElementById('close-modal-btn');
 
-// Funzione richiamata cliccando un anno (es. Primo Anno)
-window.apriPannelloAnno = function(nomeAnno, idAnno) {
-    modalTitle.innerText = nomeAnno; // L'anno diventa l'header
-    
-    // Svuota la griglia precedente
+window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
+    modalTitle.innerText = nomeAnno;
     materieGrid.innerHTML = ''; 
-    
-    // Qui puoi definire le materie per ogni anno (con i loro colori stile calendario)
+
+    // Dati delle materie (esempi usando i colori estratti)
     let materie = [];
     if (idAnno === 'terzo-anno') {
         materie = [
-            { id: 'semeiotica-medica', nome: 'Semeiotica Medica', colore: 'color-blue' },
-            { id: 'microbiologia', nome: 'Microbiologia', colore: 'color-red' },
-            { id: 'endocrinologia', nome: 'Endocrinologia', colore: 'color-yellow' }
+            { id: 'semeiotica-medica', nome: 'Semeiotica Medica', css: 's-blue' },
+            { id: 'microbiologia', nome: 'Microbiologia', css: 's-red' },
+            { id: 'endocrinologia', nome: 'Endocrinologia', css: 's-yellow' }
         ];
     } else {
-        // Messaggio segnaposto se non ci sono materie configurate
-        materieGrid.innerHTML = '<p>Materie in aggiornamento...</p>';
+        materieGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; opacity:0.5;">In aggiornamento...</p>';
     }
 
-    // Crea i quadratini colorati per le materie
     materie.forEach(materia => {
         const box = document.createElement('div');
-        box.className = `subject-box ${materia.colore}`;
+        box.className = `subject-card ${materia.css}`;
         box.innerText = materia.nome;
         box.onclick = () => {
             window.location.hash = `#/materia/${materia.id}`;
-            modalOverlay.classList.add('hidden'); // Chiude il modale e va alla pagina della materia
+            modalOverlay.classList.add('hidden'); 
         };
         materieGrid.appendChild(box);
     });
 
-    // Mostra il pannello con animazione
+    // Rimuove l'hidden per far partire la transizione CSS scale/opacity
     modalOverlay.classList.remove('hidden');
 };
 
-// Chiudi il pannello cliccando la freccia "<"
-closeModalBtn.addEventListener('click', () => {
+// Chiusura fluida
+closeBtn.addEventListener('click', () => {
     modalOverlay.classList.add('hidden');
 });
 
-// Chiudi il pannello cliccando sullo sfondo sfocato (fuori dal contenuto)
 modalOverlay.addEventListener('click', (e) => {
     if (e.target === modalOverlay) {
         modalOverlay.classList.add('hidden');
