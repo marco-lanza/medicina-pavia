@@ -9,33 +9,44 @@
 <body>
 
     <div id="app-container">
-      <div id="view-login" class="view">
-        <input type="password" id="pass-input" placeholder="Inserisci password">
-        <button id="btn-login">Accedi</button>
-      </div>
+  <!-- Schermata Login -->
+  <div id="view-login" class="view">
+    <input type="password" id="pass-input" placeholder="Inserisci password">
+    <button id="btn-login">Accedi</button>
+  </div>
 
-      <div id="view-anni" class="view" style="display: none;">
-        <button onclick="window.location.hash='#/terzo-anno'">Terzo Anno</button>
-      </div>
-        
-      <div id="view-anni" class="view" style="display: none;">
-        <button onclick="window.location.hash='#/terzo-anno'">II Anno</button>
-      </div>
-        
-      <div id="view-anni" class="view" style="display: none;">
-        <button onclick="window.location.hash='#/terzo-anno'">III Anno</button>
-      </div>
-      </div>
-        
-      <div id="view-anni" class="view" style="display: none;">
-        <button onclick="window.location.hash='#/terzo-anno'">IV Anno</button>
-      </div>
-    
-      <div id="view-materie" class="view" style="display: none;">
-        <h1 id="titolo-materia">Materia</h1>
-        <div id="lista-materiali"></div>
-      </div>
-    </div>
+  <!-- Schermata Selezione Anni -->
+  <div id="view-anni" class="view" style="display: none;">
+    <h2>Seleziona Anno</h2>
+    <br>
+    <button onclick="window.location.hash='#/primo-anno'">Primo Anno</button>
+    <button onclick="window.location.hash='#/secondo-anno'">Secondo Anno</button>
+    <button onclick="window.location.hash='#/terzo-anno'">Terzo Anno</button>
+    <button onclick="window.location.hash='#/quarto-anno'">Quarto Anno</button>
+    <button onclick="window.location.hash='#/quinto-anno'">Quinto Anno</button>
+    <button onclick="window.location.hash='#/sesto-anno'">Sesto Anno</button>
+  </div>
+
+  <!-- MENU DEL TERZO ANNO -->
+  <div id="view-terzo-anno" class="view" style="display: none;">
+    <h2>Materie Terzo Anno</h2>
+    <br>
+    <!-- NOTA IL LINK: usa #/materia/ seguito dall'ID del database -->
+    <button onclick="window.location.hash='#/materia/semeiotica-medica'">Semeiotica Medica</button>
+    <button onclick="window.location.hash='#/materia/microbiologia'">Microbiologia</button>
+    <br><br>
+    <!-- Tasto indietro rosso -->
+    <button onclick="window.location.hash='#/anni'" style="background-color: #ff3b30; color: white;">Torna agli anni</button>
+  </div>
+
+  <!-- Schermata Finale della Singola Materia (caricata da Firebase) -->
+  <div id="view-materie" class="view" style="display: none;">
+    <h1 id="titolo-materia">Materia</h1>
+    <div id="lista-materiali"></div>
+    <br><br>
+    <button onclick="window.history.back()" style="background-color: #ff3b30; color: white;">Indietro</button>
+  </div>
+</div>
 
     <!-- Il tipo "module" permette di importare le funzioni di Firebase -->
     <script type="module" src="app.js"></script>
