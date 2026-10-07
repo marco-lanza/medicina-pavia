@@ -1,28 +1,60 @@
-// 1. Inizializza Firebase con le tue chiavi
-const app = firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+// 1. Importiamo le funzioni esatte che ci servono da Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-// 2. Sistema di Routing
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// 2. DATI DELLA TUA CONFIGURAZIONE (presi da Firebase)  
+const firebaseConfig = {
+    apiKey: "AIzaSyBOct9DJUuDIFWPEXnpqiuH2gS7_eDkqHY",
+    authDomain: "medicina-pavia.firebaseapp.com",
+    projectId: "medicina-pavia",
+    storageBucket: "medicina-pavia.firebasestorage.app",
+    messagingSenderId: "371700150654",
+    appId: "1:371700150654:web:fcd524be165f9fccb3c32f",
+    measurementId: "G-BTMDMC3ZEN"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+
+// 3. Inizializziamo l'app, l'autenticazione e il database
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// --- LOGICA DEL SITO ---
+
+// Funzione utile per nascondere tutte le schermate e mostrare solo quella voluta
+function mostraSchermata(idView) {
+  document.getElementById('view-login').style.display = 'none';
+  document.getElementById('view-anni').style.display = 'none';
+  document.getElementById('view-materie').style.display = 'none';
+  
+  document.getElementById(idView).style.display = 'block';
+}
+
 function gestisciRotta() {
   const hash = window.location.hash || '#/home';
   
-  // Controlla se l'utente è loggato
-  auth.onAuthStateChanged(user => {
+  // Controlliamo se l'utente ha inserito la password corretta
+  onAuthStateChanged(auth, (user) => {
     if (!user) {
-      // Se non loggato e non è già sul login, salva dove voleva andare
       if (hash !== '#/login') {
         sessionStorage.setItem('urlDesiderato', hash);
         window.location.hash = '#/login';
       }
       mostraSchermata('view-login');
     } else {
-      // Se loggato, analizza l'hash e mostra la schermata giusta
       if (hash === '#/login') {
-        // Se ha appena fatto il login, reindirizza al link salvato o alla home
         window.location.hash = sessionStorage.getItem('urlDesiderato') || '#/anni';
       } else if (hash.startsWith('#/terzo-anno/')) {
-        const materia = hash.split('/')[2]; // estrae "microbiologia" o "semeiotica-medica"
+        const materia = hash.split('/')[2]; 
         caricaMateria(materia);
         mostraSchermata('view-materie');
       } else {
@@ -32,15 +64,42 @@ function gestisciRotta() {
   });
 }
 
-// 3. Logica del Login
+// Lettura del database per la materia specifica
+async function caricaMateria(nomeMateria) {
+  const docRef = doc(db, "materie", nomeMateria);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    const dati = docSnap.data();
+    document.getElementById('titolo-materia').innerText = dati.titoloOriginale || nomeMateria;
+    
+    const contenitore = document.getElementById('lista-materiali');
+    contenitore.innerHTML = ''; 
+    
+    if (dati.risorse) {
+      dati.risorse.forEach(risorsa => {
+        if (risorsa.tipo === 'pdf') {
+          contenitore.innerHTML += `<a href="${risorsa.url}" target="_blank">${risorsa.nome}</a><br>`;
+        }
+        if (risorsa.tipo === 'quiz') {
+          contenitore.innerHTML += `<a href="${risorsa.url}">${risorsa.nome}</a><br>`;
+        }
+      });
+    }
+  } else {
+    document.getElementById('titolo-materia').innerText = "Materiale non ancora caricato";
+    document.getElementById('lista-materiali').innerHTML = '';
+  }
+}
+
+// Azione del bottone di Login
 document.getElementById('btn-login').addEventListener('click', () => {
   const password = document.getElementById('pass-input').value;
-  // Usiamo l'email fissa creata su Firebase in background
-  auth.signInWithEmailAndPassword('studenti@medicina.it', password)
-    .catch(error => alert('Password errata'));
+  // Sostituisci la mail con quella fittizia che creerai nel pannello di Firebase Auth
+  signInWithEmailAndPassword(auth, 'studenti@medicina.it', password)
+    .catch(error => alert('Password errata! Riprova.'));
 });
 
-// Ascolta ogni volta che l'URL cambia
+// Ascoltatori degli eventi
 window.addEventListener('hashchange', gestisciRotta);
-// Avvia al caricamento della pagina
 window.addEventListener('load', gestisciRotta);
