@@ -1,28 +1,26 @@
-/* Variabili per la modalità Chiara/Scura */
 :root {
     --bg-base: #f5f5f7;
     --text-main: #111827;
-    --text-muted: #6b7280;
     --glass-bg: rgba(255, 255, 255, 0.65);
     --glass-border: rgba(255, 255, 255, 0.8);
     --blob-1: #ffb4d6;
     --blob-2: #c4d9ff;
-    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.08);
+    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.05);
 }
 
 html.dark {
     --bg-base: #000000;
     --text-main: #f3f4f6;
-    --text-muted: #9ca3af;
     --glass-bg: rgba(30, 30, 30, 0.65);
     --glass-border: rgba(255, 255, 255, 0.1);
-    --blob-1: #3b0a45;
-    --blob-2: #082046;
-    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --blob-1: #5c1435;
+    --blob-2: #142f5e;
+    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 * {
     box-sizing: border-box; margin: 0; padding: 0;
+    /* Usa il font Apple nativo senza chiamare API esterne */
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
     -webkit-font-smoothing: antialiased;
 }
@@ -34,19 +32,14 @@ body {
     display: flex; flex-direction: column; align-items: center;
 }
 
-/* --- SFONDO BLURATO DINAMICO --- */
-.ambient-bg {
-    position: fixed; inset: 0; z-index: -1; overflow: hidden;
-    background: var(--bg-base);
-}
-.blob {
-    position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6;
-    transition: background 0.8s ease;
-}
+/* --- SFONDO BLURATO (Attenuato) --- */
+.ambient-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: var(--bg-base); }
+.blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; transition: background 0.8s ease; }
+html.dark .blob { opacity: 0.25; }
 .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--blob-1); }
 .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: var(--blob-2); }
 
-/* --- VETRO SATINATO (Base per Pannelli e Pillole) --- */
+/* --- COMPONENTI GLASS --- */
 .glass-panel, .glass-pill, .morph-panel {
     background: var(--glass-bg);
     backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
@@ -54,126 +47,135 @@ body {
     box-shadow: var(--shadow-main);
 }
 
-/* --- HEADER PILL-SHAPED --- */
+/* --- HEADER IN PRIMO PIANO --- */
 .top-header {
     width: 90%; max-width: 600px; margin-top: 20px;
     border-radius: 50px; padding: 15px 25px;
     display: flex; justify-content: space-between; align-items: center;
-    z-index: 10;
+    position: relative; z-index: 100; /* Sopra a tutto, anche al blur */
 }
 .nav-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
 
-/* FIX SLIDER TEMA */
 .theme-toggle-container {
-    position: relative; width: 70px; height: 34px;
-    background: rgba(120, 120, 120, 0.2); border-radius: 34px;
+    position: relative; width: 64px; height: 32px;
+    background: rgba(120, 120, 120, 0.2); border-radius: 32px;
     display: flex; align-items: center; justify-content: space-between;
-    cursor: pointer; padding: 4px;
+    cursor: pointer; padding: 3px;
 }
 .theme-slider {
-    position: absolute; top: 4px; left: 4px;
-    width: 26px; height: 26px; border-radius: 50%;
-    background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    position: absolute; top: 3px; left: 3px; width: 26px; height: 26px;
+    border-radius: 50%; background: white; z-index: 1;
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    z-index: 1; /* Sotto le icone */
 }
-html.dark .theme-slider { background: #444; transform: translateX(36px); }
-.theme-icon {
-    width: 26px; text-align: center; font-size: 13px;
-    z-index: 2; /* Sopra il pallino */
-    pointer-events: none; color: var(--text-main);
-    transition: color 0.3s;
-}
+html.dark .theme-slider { background: #444; transform: translateX(32px); }
+.theme-icon { width: 26px; text-align: center; font-size: 13px; z-index: 2; pointer-events: none; }
 
 /* --- CONTENITORE CENTRALE --- */
 .app-main {
     flex: 1; width: 100%; max-width: 800px;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 10;
 }
 .view-section { width: 100%; display: flex; flex-direction: column; align-items: center; }
 
-/* --- LOGIN --- */
+/* --- LOGIN E BOTTONI ANNI --- */
 .login-panel { width: 90%; max-width: 360px; padding: 40px 30px; border-radius: 36px; text-align: center; }
-.login-panel h2 { font-size: 22px; font-weight: 700; margin-bottom: 5px; }
-.subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; }
-
+.login-panel h2 { font-size: 22px; margin-bottom: 20px; }
 .glass-input {
     width: 100%; padding: 16px; border-radius: 16px; border: 1px solid var(--glass-border);
-    background: rgba(120,120,120,0.1); color: var(--text-main);
-    font-size: 16px; font-weight: 600; outline: none; margin-bottom: 15px;
+    background: rgba(120,120,120,0.1); color: var(--text-main); font-weight: 600; outline: none; margin-bottom: 15px;
 }
-.glass-btn-solid {
-    width: 100%; padding: 16px; border-radius: 16px; border: none;
-    background: var(--text-main); color: var(--bg-base); font-size: 16px; font-weight: 700; cursor: pointer;
-}
+.glass-btn-solid { width: 100%; padding: 16px; border-radius: 16px; border: none; background: var(--text-main); color: var(--bg-base); font-weight: 700; cursor: pointer; }
 
-/* --- BOTTONI ANNI --- */
 .years-container { gap: 14px; width: 90%; max-width: 360px; }
 .year-btn {
     width: 100%; padding: 20px 25px; border-radius: 50px;
     display: flex; align-items: center; cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
+    transition: background 0.3s;
 }
-.year-btn:hover { background: rgba(120,120,120,0.1); transform: scale(1.02); }
-
-.pill-dot {
-    width: 12px; height: 12px; border-radius: 50%; background-color: var(--text-main);
-    opacity: 0.3; margin-right: 18px;
-}
+.year-btn:hover { background: rgba(120,120,120,0.1); }
+.pill-dot { width: 12px; height: 12px; border-radius: 50%; background-color: var(--text-main); opacity: 0.3; margin-right: 18px; }
 .pill-text { font-size: 18px; font-weight: 600; color: var(--text-main); }
 
-/* --- IL MODALE (MORPHING E BLUR) --- */
+/* --- MODAL E BLUR OVERLAY --- */
 .modal-backdrop {
-    position: fixed; inset: 0; z-index: 50;
-    background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-    transition: opacity 0.5s ease, backdrop-filter 0.5s ease;
+    position: fixed; top: 80px; left: 0; right: 0; bottom: 0; z-index: 50; /* Parte sotto l'header */
+    background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    transition: opacity 0.4s ease;
 }
-html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.6); }
-.modal-backdrop.hidden {
-    opacity: 0; pointer-events: none; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px);
-}
+html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.5); }
+.modal-backdrop.hidden { opacity: 0; pointer-events: none; }
 
-/* Il pannello che si espande dal bottone */
+/* --- IL PANNELLO MORPHING --- */
 .morph-panel {
-    position: absolute; /* Fondamentale per il morphing */
-    overflow: hidden;
-    /* La transizione gestisce lo spostamento, l'allargamento e lo smussamento */
-    transition: top 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
-                left 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
-                width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
-                height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
-                border-radius 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
-                transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: absolute; overflow: hidden; z-index: 60;
+    /* La transizione è uniforme per evitare l'effetto più veloce a sinistra */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
+.hidden-morph { opacity: 0; pointer-events: none; }
 
-/* Contenuti interni che sfumano dopo l'espansione */
-.panel-header, .subjects-grid { transition: opacity 0.3s ease; transition-delay: 0.2s; }
-.panel-header { display: flex; align-items: center; border-bottom: 1px solid var(--glass-border); padding: 25px; }
+/* --- L'HEADER INTERNO (Il testo e il pallino che si muovono) --- */
+.panel-header {
+    display: flex; align-items: center; padding: 20px 25px;
+    border-bottom: 1px solid transparent; transition: border-bottom 0.4s;
+}
+.morph-panel.expanded .panel-header { border-bottom: 1px solid var(--glass-border); padding: 25px 30px; }
 
-/* Tasto indietro che simula il pallino */
-.morph-back-btn {
-    width: 36px; height: 36px; border-radius: 50%; border: none;
-    background: rgba(120,120,120,0.2); color: var(--text-main);
+.morph-dot-element {
+    width: 12px; height: 12px; border-radius: 50%;
+    background-color: var(--text-main); opacity: 0.3; margin-right: 18px;
     display: flex; justify-content: center; align-items: center;
-    margin-right: 15px; cursor: pointer; transition: transform 0.2s;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
 }
-.morph-back-btn:hover { transform: scale(1.08); }
-.panel-title { font-size: 22px; font-weight: 700; }
+/* Quando il pannello è espanso, il pallino diventa un grosso bottone */
+.morph-panel.expanded .morph-dot-element {
+    width: 36px; height: 36px; opacity: 1;
+    background-color: rgba(120,120,120,0.2); margin-right: 15px;
+}
+.back-icon { font-size: 14px; color: var(--text-main); opacity: 0; transition: opacity 0.3s; }
+.morph-panel.expanded .back-icon { opacity: 1; }
 
-.subjects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; padding: 25px; }
-.subject-card {
-    aspect-ratio: 1; border-radius: 24px; padding: 15px; text-align: center;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.2s;
-    border: 1px solid var(--glass-border);
+.panel-title { font-size: 18px; font-weight: 600; transition: font-size 0.4s; }
+.morph-panel.expanded .panel-title { font-size: 22px; font-weight: 700; }
+
+/* --- SPLIT VIEW (Sinistra/Destra) --- */
+.split-view {
+    display: flex; height: calc(100% - 87px); opacity: 0;
+    transition: opacity 0.3s ease; transition-delay: 0.1s;
 }
-.subject-card:hover { transform: scale(1.05); }
+.morph-panel.expanded .split-view { opacity: 1; }
+
+.split-left {
+    width: 40%; border-right: 1px solid var(--glass-border);
+    padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+}
+.split-right { width: 60%; padding: 20px; overflow-y: auto; }
+.placeholder-text { text-align: center; color: var(--text-muted); margin-top: 40px; font-weight: 600; }
+
+/* --- BOTTONI MATERIE PILL-SHAPED (Stile Calendario) --- */
+.subject-pill {
+    width: 100%; padding: 15px; border-radius: 20px;
+    font-size: 14px; font-weight: 700; text-align: left;
+    cursor: pointer; border: 1px solid transparent;
+    transition: transform 0.2s, opacity 0.2s;
+}
+.subject-pill:hover { transform: scale(1.02); }
+.subject-pill.active { border-color: var(--glass-border); opacity: 0.7; }
 
 /* Colori materie in stile calendario */
-.s-red { background: rgba(255, 59, 48, 0.2); color: #c91408; }
-.s-blue { background: rgba(0, 122, 255, 0.2); color: #005bb5; }
-.s-yellow { background: rgba(255, 204, 0, 0.2); color: #a38200; }
-html.dark .s-red { color: #ff6b60; }
-html.dark .s-blue { color: #4da6ff; }
-html.dark .s-yellow { color: #ffe033; }
+.s-red { background: rgba(255, 59, 48, 0.18); color: #c91408; }
+.s-blue { background: rgba(0, 122, 255, 0.18); color: #005bb5; }
+.s-yellow { background: rgba(255, 204, 0, 0.18); color: #a38200; }
+html.dark .s-red { background: rgba(255, 59, 48, 0.25); color: #ff6b60; }
+html.dark .s-blue { background: rgba(0, 122, 255, 0.25); color: #4da6ff; }
+html.dark .s-yellow { background: rgba(255, 204, 0, 0.25); color: #ffe033; }
+
+/* --- STILE RISORSE --- */
+.resource-item {
+    display: block; padding: 15px; margin-bottom: 10px;
+    border-radius: 16px; background: rgba(120,120,120,0.1);
+    color: var(--text-main); font-weight: 600; text-decoration: none;
+    transition: background 0.2s;
+}
+.resource-item:hover { background: rgba(120,120,120,0.2); }
