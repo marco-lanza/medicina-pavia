@@ -4,61 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portale Medicina Pavia</title>
-    <!-- Qui colleghiamo il file del design glassmorphism -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="app-container">
-      <!-- Schermata Login -->
       <div id="view-login" class="view">
         <input type="password" id="pass-input" placeholder="Inserisci password">
         <button id="btn-login">Accedi</button>
       </div>
 
-      <!-- Schermata Selezione Anni -->
       <div id="view-anni" class="view" style="display: none;">
         <button onclick="window.location.hash='#/terzo-anno'">Terzo Anno</button>
       </div>
 
-      <!-- Schermata Materie (Es. Semeiotica, Microbiologia) -->
       <div id="view-materie" class="view" style="display: none;">
         <h1 id="titolo-materia">Materia</h1>
         <div id="lista-materiali"></div>
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 1. INCOLLA QUI SOTTO IL CODICE DI FIREBASE -->
-    <!-- ========================================== -->
-    
-   <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBOct9DJUuDIFWPEXnpqiuH2gS7_eDkqHY",
-    authDomain: "medicina-pavia.firebaseapp.com",
-    projectId: "medicina-pavia",
-    storageBucket: "medicina-pavia.firebasestorage.app",
-    messagingSenderId: "371700150654",
-    appId: "1:371700150654:web:fcd524be165f9fccb3c32f",
-    measurementId: "G-BTMDMC3ZEN"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-
-    <!-- ========================================== -->
-    <!-- 2. COLLEGA IL TUO FILE JAVASCRIPT          -->
-    <!-- ========================================== -->
+    <!-- Il tipo "module" permette di importare le funzioni di Firebase -->
     <script type="module" src="app.js"></script>
 
 </body>
