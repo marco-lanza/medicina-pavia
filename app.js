@@ -136,11 +136,33 @@ window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
     materieList.innerHTML = '';
     risorseList.innerHTML = '<div class="placeholder-text">Seleziona una materia per visualizzare il materiale</div>';
 
-    let materie = idAnno === 'terzo-anno' ? [
-        { id: 'semeiotica-medica', nome: 'Semeiotica Medica', css: 's-blue' },
-        { id: 'microbiologia', nome: 'Microbiologia', css: 's-red' },
-        { id: 'endocrinologia', nome: 'Endocrinologia', css: 's-yellow' }
-    ] : [];
+// Struttura delle materie dinamicamente associata all'anno selezionato
+    let materie = [];
+    
+    if (idAnno === 'secondo-anno') {
+        materie = [
+            { id: 'storia-medicina', nome: 'Storia della Medicina', css: 's-orange' },
+            { id: 'epidemiologia', nome: 'Epidemiologia', css: 's-cyan' }
+        ];
+    } else if (idAnno === 'terzo-anno') {
+        materie = [
+            { id: 'semeiotica-medica', nome: 'Semeiotica Medica', css: 's-blue' },
+            { id: 'ematologia', nome: 'Ematologia', css: 's-red' },
+            { id: 'microbiologia', nome: 'Microbiologia', css: 's-green' },
+            { id: 'endocrinologia', nome: 'Endocrinologia', css: 's-yellow' }
+        ];
+    } else if (idAnno === 'quarto-anno') {
+        materie = [
+            { id: 'pneumologia', nome: 'Pneumologia', css: 's-mint' },
+            { id: 'ortopedia', nome: 'Ortopedia', css: 's-indigo' },
+            { id: 'cardiologia', nome: 'Cardiologia', css: 's-red' },
+            { id: 'nefrologia', nome: 'Nefrologia', css: 's-yellow' },
+            { id: 'gastroenterologia', nome: 'Gastroenterologia', css: 's-orange' },
+            { id: 'reumatologia', nome: 'Reumatologia', css: 's-purple' },
+            { id: 'radiologia', nome: 'Radiologia', css: 's-cyan' },
+            { id: 'dermatologia', nome: 'Dermatologia', css: 's-pink' }
+        ];
+    }
 
     materie.forEach(m => {
         const pill = document.createElement('div');
