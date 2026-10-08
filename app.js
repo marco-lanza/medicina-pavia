@@ -60,6 +60,8 @@ window.toggleTheme = function() {
 // ==========================================
 // 3. ROUTER E LOGIN
 // ==========================================
+window.inTransizioneLogin = false; // Variabile per fermare Firebase durante l'animazione
+
 function mostraSchermata(idView) {
     document.querySelectorAll('.view-section').forEach(view => view.style.display = 'none');
     const viewDaMostrare = document.getElementById(idView);
@@ -67,9 +69,15 @@ function mostraSchermata(idView) {
 }
 
 function gestisciRotta() {
+    // Se c'è l'animazione in corso, blocca il router istantaneo
+    if (window.inTransizioneLogin) return; 
+    
     const hash = window.location.hash || '#/anni';
     
     onAuthStateChanged(auth, (user) => {
+        // Doppio controllo in caso Firebase spari l'evento in ritardo
+        if (window.inTransizioneLogin) return; 
+        
         if (!user) {
             if (hash !== '#/login') {
                 sessionStorage.setItem('urlDesiderato', hash);
@@ -86,7 +94,7 @@ function gestisciRotta() {
     });
 }
 
-// --- LOGIN CON ANIMAZIONE (Senza alert popup) ---
+// --- LOGIN CON ANIMAZIONE TESTUALE (Senza alert popup) ---
 document.getElementById('btn-login').addEventListener('click', eseguiLogin);
 
 document.getElementById('pass-input').addEventListener('keypress', function (e) {
@@ -100,39 +108,45 @@ function eseguiLogin() {
     const password = document.getElementById('pass-input').value;
     const btn = document.getElementById('btn-login');
     
+    window.inTransizioneLogin = true; // Blocca il cambio schermata
+    
     // Feedback di caricamento con rotellina
     btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verifica...';
-    btn.classList.remove('btn-error', 'btn-success'); // Pulisce stati precedenti
+    btn.classList.remove('text-error', 'text-success'); 
     
     setPersistence(auth, browserSessionPersistence)
         .then(() => {
             return signInWithEmailAndPassword(auth, 'studenti@medicina.it', password);
         })
         .then(() => {
-            // Password corretta: Bottone verde con Checkmark
-            btn.classList.add('btn-success');
+            // Password corretta: Testo verde con Checkmark
+            btn.classList.add('text-success');
             btn.innerHTML = '<i class="fas fa-check icon-anim" style="font-size: 20px;"></i>';
             
-            // Attende esattamente 1 secondo prima di far entrare
+            // Attende esattamente 1 secondo per far finire l'animazione
             setTimeout(() => {
+                window.inTransizioneLogin = false; // Sblocca il router
                 window.location.hash = sessionStorage.getItem('urlDesiderato') || '#/anni';
+                gestisciRotta(); // Lancia il router manualmente
                 
                 // Ripristina il bottone di nascosto per i futuri login
                 setTimeout(() => {
-                    btn.classList.remove('btn-success');
+                    btn.classList.remove('text-success');
                     btn.innerText = 'Accedi';
                     document.getElementById('pass-input').value = '';
                 }, 500);
             }, 1000);
         })
         .catch(error => {
-            // Password errata: Bottone rosso con X e testo
-            btn.classList.add('btn-error');
+            window.inTransizioneLogin = false; // Sblocca il router in caso di errore
+            
+            // Password errata: Testo rosso con X
+            btn.classList.add('text-error');
             btn.innerHTML = '<i class="fas fa-times icon-anim" style="margin-right: 8px;"></i> Password errata. Riprova.';
             
             // Cancella l'errore e torna normale dopo 2.5 secondi
             setTimeout(() => {
-                btn.classList.remove('btn-error');
+                btn.classList.remove('text-error');
                 btn.innerText = 'Accedi';
                 document.getElementById('pass-input').value = '';
             }, 2500);
