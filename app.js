@@ -75,7 +75,12 @@ function gestisciRotta() {
 
 document.getElementById('btn-login').addEventListener('click', () => {
     const password = document.getElementById('pass-input').value;
-    signInWithEmailAndPassword(auth, 'studenti@medicina.it', password)
+    
+    // Imposta la sessione in modo che scada quando si chiude il browser
+    setPersistence(auth, browserSessionPersistence)
+        .then(() => {
+            return signInWithEmailAndPassword(auth, 'studenti@medicina.it', password);
+        })
         .then(() => {
             window.location.hash = sessionStorage.getItem('urlDesiderato') || '#/anni';
         })
