@@ -186,7 +186,7 @@ window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
     
     if (idAnno === 'secondo-anno') {
         materie = [
-            { id: 'storia-medicina', nome: 'Storia della Medicina', css: 's-orange' },
+            { id: 'storia-della-medicina', nome: 'Storia della Medicina', css: 's-orange' },
             { id: 'epidemiologia', nome: 'Epidemiologia', css: 's-cyan' }
         ];
     } else if (idAnno === 'terzo-anno') {
