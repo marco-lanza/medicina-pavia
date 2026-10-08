@@ -188,17 +188,18 @@ async function caricaMateriale(idMateria, nomeMateria) {
                         </a>`;
                 });
             } else {
-                risorseList.innerHTML += '<p style="color: var(--placeholder); font-size:14px;">Nessun materiale caricato per questa materia.</p>';
+                risorseList.innerHTML += '<p style="color: var(--placeholder); font-size:14px;">Nessun materiale ancora caricato per questa materia.</p>';
             }
         } else {
+            // FIX: Ora mostra un messaggio vuoto se il documento non esiste ancora su Firebase
             risorseList.innerHTML = `
                 <h3 style="font-weight:500; font-size:18px; margin-bottom:15px;">${nomeMateria}</h3>
-                <a href="#" class="resource-item"><i class="fas fa-file-pdf"></i> Appunti Completi (PDF)</a>
-                <a href="#" class="resource-item"><i class="fas fa-check-circle"></i> Quiz Interattivo</a>
+                <p style="color: var(--placeholder); font-size:14px; text-align: left;">Nessun materiale ancora caricato per questa materia.</p>
             `;
         }
     } catch(e) {
-        risorseList.innerHTML = '<div class="placeholder-text">Errore DB. Database in modalità provvisoria.</div>';
+        risorseList.innerHTML = '<div class="placeholder-text" style="color: #ff3b30;">Errore di connessione al database. Riprova più tardi.</div>';
+        console.error(e);
     }
 }
 
