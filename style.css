@@ -194,12 +194,45 @@ html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.4); }
 .subject-pill:hover { transform: scale(1.02); }
 .subject-pill.active { border-color: var(--glass-border); opacity: 0.9; }
 
-.s-red { background: rgba(255, 59, 48, 0.15); color: #c91408; }
-.s-blue { background: rgba(0, 122, 255, 0.15); color: #005bb5; }
-.s-yellow { background: rgba(255, 204, 0, 0.15); color: #a38200; }
-html.dark .s-red { background: rgba(255, 59, 48, 0.25); color: #ff6b60; }
-html.dark .s-blue { background: rgba(0, 122, 255, 0.25); color: #4da6ff; }
-html.dark .s-yellow { background: rgba(255, 204, 0, 0.25); color: #ffe033; }
+/* --- COLORI MATERIE COMPLETI (Palette Calendario iOS) --- */
+.s-red    { background: rgba(255, 59, 48, 0.15);  color: #c91408; }
+.s-orange { background: rgba(255, 149, 0, 0.15);  color: #b36800; }
+.s-yellow { background: rgba(255, 204, 0, 0.15);  color: #a38200; }
+.s-green  { background: rgba(52, 199, 89, 0.15);  color: #248a3d; }
+.s-mint   { background: rgba(0, 199, 190, 0.15);  color: #008580; }
+.s-cyan   { background: rgba(90, 200, 250, 0.15); color: #007a99; }
+.s-blue   { background: rgba(0, 122, 255, 0.15);  color: #005bb5; }
+.s-indigo { background: rgba(88, 86, 214, 0.15);  color: #4a48b5; }
+.s-purple { background: rgba(175, 82, 222, 0.15); color: #7b31a3; }
+.s-pink   { background: rgba(255, 45, 85, 0.15);  color: #c90a2c; }
+
+html.dark .s-red    { background: rgba(255, 59, 48, 0.25);  color: #ff6b60; }
+html.dark .s-orange { background: rgba(255, 149, 0, 0.25);  color: #ffb340; }
+html.dark .s-yellow { background: rgba(255, 204, 0, 0.25);  color: #ffe033; }
+html.dark .s-green  { background: rgba(52, 199, 89, 0.25);  color: #5ddb80; }
+html.dark .s-mint   { background: rgba(0, 199, 190, 0.25);  color: #4deae1; }
+html.dark .s-cyan   { background: rgba(90, 200, 250, 0.25); color: #66d4ff; }
+html.dark .s-blue   { background: rgba(0, 122, 255, 0.25);  color: #4da6ff; }
+html.dark .s-indigo { background: rgba(88, 86, 214, 0.25);  color: #9e9cf0; }
+html.dark .s-purple { background: rgba(175, 82, 222, 0.25); color: #c985f0; }
+html.dark .s-pink   { background: rgba(255, 45, 85, 0.25);  color: #ff6b8a; }
+
+/* --- ANIMAZIONE CHECKMARK LOGIN --- */
+.glass-btn-solid { 
+    /* Aggiungiamo la transizione al bottone originale */
+    transition: all 0.3s ease; 
+}
+.btn-success {
+    background-color: #34c759 !important; /* Verde acceso Apple */
+    color: #ffffff !important;
+}
+.btn-success i {
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+@keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
 
 .resource-item {
     display: flex; align-items: center; padding: 16px; margin-bottom: 12px;
