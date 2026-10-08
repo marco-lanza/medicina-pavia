@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Medicina Pavia</title>
-    <!-- Solo FontAwesome, NESSUN link a Google Fonts per SF Pro -->
+    <!-- Solo FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Sfondo con sfumature (molto attenuate) -->
+    <!-- Sfondo con gradienti (estremamente attenuati) -->
     <div class="ambient-bg">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
     </div>
 
-    <!-- Header sempre in primo piano -->
+    <!-- Header sempre in primissimo piano (sopra il blur) -->
     <header class="glass-pill top-header">
         <h1 class="nav-title">Medicina Pavia</h1>
         <div class="theme-toggle-container" onclick="toggleTheme()">
@@ -28,7 +28,7 @@
 
     <main id="app-container" class="app-main">
         
-        <!-- Schermata Login (Gestita dal vero Firebase in JS) -->
+        <!-- Schermata Login -->
         <div id="view-login" class="view-section glass-panel login-panel">
             <h2>Area Riservata</h2>
             <input type="password" id="pass-input" placeholder="Password" class="glass-input">
@@ -37,7 +37,6 @@
 
         <!-- Schermata Anni -->
         <div id="view-anni" class="view-section years-container" style="display: none;">
-            <!-- I bottoni non fanno un "pop", ma passano i loro dati all'animazione -->
             <button class="glass-pill year-btn" onclick="apriPannelloAnno('Primo Anno', 'primo-anno', this)">
                 <div class="pill-dot"></div> <span class="pill-text">Primo Anno</span>
             </button>
@@ -59,31 +58,27 @@
         </div>
     </main>
 
-    <!-- Overlay (Blur) che non copre l'Header -->
+    <!-- Overlay Blur (Copre tutto tranne l'Header) -->
     <div id="modal-overlay" class="modal-backdrop hidden"></div>
 
-    <!-- Pannello Morphing (Parte fisicamente dal bottone) -->
+    <!-- Pannello Morphing (Si espande dal bottone) -->
     <div id="modal-content" class="morph-panel hidden-morph">
         <div class="panel-header" id="panel-header">
-            <!-- Il pallino si trasforma in questo bottone -->
             <div id="morph-dot" class="morph-dot-element">
                 <i class="fas fa-chevron-left back-icon" id="back-icon"></i>
             </div>
             <h2 id="modal-title" class="panel-title">Anno</h2>
         </div>
         
-        <!-- Struttura divisa a metà per Materie e Materiale -->
+        <!-- Split View (Sinistra/Destra) -->
         <div id="split-view" class="split-view">
-            <div class="split-left" id="materie-list">
-                <!-- Materie generate via JS -->
-            </div>
+            <div class="split-left" id="materie-list"></div>
             <div class="split-right" id="risorse-list">
                 <div class="placeholder-text">Seleziona una materia per visualizzare il materiale</div>
             </div>
         </div>
     </div>
 
-    <!-- Collega l'app JS -->
     <script type="module" src="app.js"></script>
 </body>
 </html>
