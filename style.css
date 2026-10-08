@@ -247,13 +247,11 @@ html.dark .s-pink   { background: rgba(255, 45, 85, 0.25);  color: #ff6b8a; }
 .glass-btn-solid { 
     transition: all 0.3s ease; 
 }
-.btn-success {
-    background-color: #34c759 !important; /* Verde Apple */
-    color: #ffffff !important;
+.text-success {
+    color: #34c759 !important; /* Verde acceso solo per testo e icona */
 }
-.btn-error {
-    background-color: #ff3b30 !important; /* Rosso Apple */
-    color: #ffffff !important;
+.text-error {
+    color: #ff3b30 !important; /* Rosso acceso solo per testo e icona */
 }
 .icon-anim {
     display: inline-block;
