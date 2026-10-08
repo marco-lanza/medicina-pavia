@@ -27,7 +27,18 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const analytics = getAnalytics(app);
 
-// --- TEMA ---
+// ==========================================
+// 1. HARD-LOCK DELLA SESSIONE DI SICUREZZA
+// ==========================================
+// Se l'utente apre una nuova scheda o riavvia il browser, forziamo il logout!
+if (!sessionStorage.getItem('app_session_attiva')) {
+    signOut(auth);
+    sessionStorage.setItem('app_session_attiva', 'true');
+}
+
+// ==========================================
+// 2. TEMA
+// ==========================================
 function applyTheme(theme) {
     if(theme === 'dark') {
         document.documentElement.classList.add('dark');
@@ -46,7 +57,9 @@ window.toggleTheme = function() {
     applyTheme(currentTheme);
 };
 
-// --- ROUTER ---
+// ==========================================
+// 3. ROUTER E LOGIN
+// ==========================================
 function mostraSchermata(idView) {
     document.querySelectorAll('.view-section').forEach(view => view.style.display = 'none');
     const viewDaMostrare = document.getElementById(idView);
@@ -73,10 +86,10 @@ function gestisciRotta() {
     });
 }
 
+// Eseguiamo il login e diciamo a Firebase di NON salvarlo su disco
 document.getElementById('btn-login').addEventListener('click', () => {
     const password = document.getElementById('pass-input').value;
     
-    // Imposta la sessione in modo che scada quando si chiude il browser
     setPersistence(auth, browserSessionPersistence)
         .then(() => {
             return signInWithEmailAndPassword(auth, 'studenti@medicina.it', password);
@@ -90,7 +103,9 @@ document.getElementById('btn-login').addEventListener('click', () => {
 window.addEventListener('hashchange', gestisciRotta);
 window.addEventListener('load', gestisciRotta);
 
-// --- ANIMAZIONE MORPHING SIMMETRICA ---
+// ==========================================
+// 4. ANIMAZIONE MORPHING SIMMETRICA
+// ==========================================
 const modalOverlay = document.getElementById('modal-overlay');
 const morphPanel = document.getElementById('modal-content');
 const materieList = document.getElementById('materie-list');
@@ -135,7 +150,7 @@ window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
     
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-            const finalW = Math.min(window.innerWidth * 0.9, 800); // 800px esatti come l'header
+            const finalW = Math.min(window.innerWidth * 0.9, 800); 
             const finalH = Math.min(window.innerHeight * 0.7, 550); 
             const finalL = (window.innerWidth - finalW) / 2;
             const finalT = (window.innerHeight - finalH) / 2 + 30; 
@@ -188,7 +203,9 @@ async function caricaMateriale(idMateria, nomeMateria) {
 }
 
 document.getElementById('morph-dot').addEventListener('click', chiudiPannello);
-modalOverlay.addEventListener('click', chiudiPannello);
+modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) chiudiPannello();
+});
 
 function chiudiPannello() {
     if (!originalRect) return;
