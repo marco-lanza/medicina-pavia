@@ -143,7 +143,7 @@ html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.4); }
 .panel-title { font-size: 17px; font-weight: 500; transition: font-size 0.4s; }
 .morph-panel.expanded .panel-title { font-size: 20px; font-weight: 500; }
 
-/* --- BOTTONE CALENDARIO SPECULARE --- */
+/* --- BOTTONE CALENDARIO IN SPECULARE --- */
 .calendar-btn {
     width: 32px; height: 32px; border-radius: 50%;
     background-color: rgba(120,120,120,0.15); color: var(--text-main);
