@@ -97,6 +97,7 @@ html.dark .theme-slider { background: #333; transform: translateX(30px); }
     width: 100%; padding: 18px 24px; border-radius: 50px;
     display: flex; align-items: center; cursor: pointer;
     transition: background 0.3s;
+    /* RIMOSSO IL TRANSFORM SCALE CHE CAUSAVA IL SALTELLO */
 }
 .year-btn:hover { background: rgba(120,120,120,0.2); }
 .pill-dot { width: 10px; height: 10px; border-radius: 50%; background-color: var(--text-main); opacity: 0.3; margin-right: 18px; }
@@ -119,46 +120,40 @@ html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.4); }
 }
 .hidden-morph { opacity: 0; pointer-events: none; }
 
-/* --- L'HEADER INTERNO (Correzione dello slittamento) --- */
+/* --- L'HEADER INTERNO --- */
 .panel-header {
-    display: flex; align-items: center; 
-    /* Stato iniziale ESATTAMENTE UGUALE al bottone della pillola */
+    display: flex; align-items: center; position: relative;
+    /* Margini che prevengono lo spostamento orizzontale */
     margin: 0; padding: 18px 24px;
-    border-bottom: 1px solid transparent; 
-    transition: all 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    border-bottom: 1px solid transparent; transition: all 0.65s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .morph-panel.expanded .panel-header { 
-    /* Stato finale espanso con i margini larghi */
     margin: 0 35px; padding: 20px 0;
     border-bottom: 1px solid var(--glass-border-strong); 
 }
 
 .morph-dot-element {
     width: 10px; height: 10px; border-radius: 50%;
-    /* Margini iniziali identici a quelli della pillola */
-    background-color: var(--text-main); opacity: 0.3; margin-right: 18px; margin-left: 0;
+    background-color: var(--text-main); opacity: 0.3; margin-right: 18px;
     display: flex; justify-content: center; align-items: center;
     transition: all 0.65s cubic-bezier(0.22, 1, 0.36, 1); cursor: pointer;
 }
 .morph-panel.expanded .morph-dot-element {
-    /* Si allarga in un bottone rotondo */
     width: 32px; height: 32px; opacity: 1;
     background-color: rgba(120,120,120,0.15); margin-right: 15px; margin-left: -5px;
 }
-
 .back-icon { font-size: 13px; color: var(--text-main); opacity: 0; transition: opacity 0.3s; }
 .morph-panel.expanded .back-icon { opacity: 1; }
 
-/* Titolo fluido */
-.panel-title { font-size: 17px; font-weight: 500; transition: all 0.65s cubic-bezier(0.22, 1, 0.36, 1); }
-.morph-panel.expanded .panel-title { font-size: 20px; }
+.panel-title { font-size: 17px; font-weight: 500; transition: font-size 0.4s; }
+.morph-panel.expanded .panel-title { font-size: 20px; font-weight: 500; }
 
-/* --- BOTTONE CALENDARIO IN SPECULARE --- */
+/* --- BOTTONE CALENDARIO SPECULARE IN POSIZIONE ASSOLUTA --- */
 .calendar-btn {
+    position: absolute; right: 24px;
     width: 32px; height: 32px; border-radius: 50%;
     background-color: rgba(120,120,120,0.15); color: var(--text-main);
     display: flex; justify-content: center; align-items: center;
-    margin-left: auto; margin-right: -5px; /* Perfettamente speculare al bottone indietro */
     text-decoration: none; font-size: 13px;
     opacity: 0; pointer-events: none; transition: all 0.3s;
 }
@@ -167,7 +162,7 @@ html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.4); }
     background-color: rgba(120,120,120,0.25);
 }
 .morph-panel.expanded .calendar-btn {
-    opacity: 1; pointer-events: auto;
+    opacity: 1; pointer-events: auto; right: 0; /* Si allinea al bordo espanso */
 }
 
 /* --- SPLIT VIEW --- */
