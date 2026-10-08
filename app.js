@@ -100,6 +100,14 @@ document.getElementById('btn-login').addEventListener('click', () => {
         .catch(error => alert('Password errata. Riprova.'));
 });
 
+// Permette di usare il tasto Invio per effettuare l'accesso
+document.getElementById('pass-input').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        e.preventDefault(); // Evita ricaricamenti anomali della pagina
+        document.getElementById('btn-login').click();
+    }
+});
+
 window.addEventListener('hashchange', gestisciRotta);
 window.addEventListener('load', gestisciRotta);
 
