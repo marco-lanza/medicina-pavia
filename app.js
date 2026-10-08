@@ -25,7 +25,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const analytics = getAnalytics(app);
 
-// --- GESTIONE TEMA ---
+// --- TEMA ---
 function applyTheme(theme) {
     if(theme === 'dark') {
         document.documentElement.classList.add('dark');
@@ -44,7 +44,7 @@ window.toggleTheme = function() {
     applyTheme(currentTheme);
 };
 
-// --- ROUTER E SICUREZZA (La password serve davvero) ---
+// --- ROUTER E LOGIN ---
 function mostraSchermata(idView) {
     document.querySelectorAll('.view-section').forEach(view => view.style.display = 'none');
     const viewDaMostrare = document.getElementById(idView);
@@ -54,17 +54,14 @@ function mostraSchermata(idView) {
 function gestisciRotta() {
     const hash = window.location.hash || '#/anni';
     
-    // Controlla il vero stato di Firebase Auth
     onAuthStateChanged(auth, (user) => {
         if (!user) {
-            // Se NON è loggato, blocca l'accesso e rimanda al login
             if (hash !== '#/login') {
                 sessionStorage.setItem('urlDesiderato', hash);
                 window.location.replace('#/login');
             }
             mostraSchermata('view-login');
         } else {
-            // Se È loggato, permette la navigazione
             if (hash === '#/login') {
                 window.location.replace(sessionStorage.getItem('urlDesiderato') || '#/anni');
             } else {
@@ -74,10 +71,13 @@ function gestisciRotta() {
     });
 }
 
-// Evento Login tramite Firebase
 document.getElementById('btn-login').addEventListener('click', () => {
     const password = document.getElementById('pass-input').value;
     signInWithEmailAndPassword(auth, 'studenti@medicina.it', password)
+        .then(() => {
+            // Dopo il login sposta all'hash desiderato
+            window.location.hash = sessionStorage.getItem('urlDesiderato') || '#/anni';
+        })
         .catch(error => alert('Password errata. Riprova.'));
 });
 
@@ -85,7 +85,7 @@ window.addEventListener('hashchange', gestisciRotta);
 window.addEventListener('load', gestisciRotta);
 
 
-// --- ANIMAZIONE MORPHING FLUIDA E SPLIT VIEW ---
+// --- ANIMAZIONE MORPHING (Senza oscillazioni) ---
 const modalOverlay = document.getElementById('modal-overlay');
 const morphPanel = document.getElementById('modal-content');
 const materieList = document.getElementById('materie-list');
@@ -95,10 +95,9 @@ let originalRect = null;
 window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
     document.getElementById('modal-title').innerText = nomeAnno;
     
-    // 1. Calcola posizione esatta del bottone
+    // 1. Calcolo esatto del pixel di partenza
     originalRect = btnElement.getBoundingClientRect();
     
-    // 2. Piazza il pannello invisibile esattamente sopra il bottone
     morphPanel.style.transition = 'none';
     morphPanel.classList.remove('hidden-morph', 'expanded');
     morphPanel.style.top = originalRect.top + 'px';
@@ -106,59 +105,54 @@ window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
     morphPanel.style.width = originalRect.width + 'px';
     morphPanel.style.height = originalRect.height + 'px';
     morphPanel.style.borderRadius = '50px';
+    morphPanel.style.transform = 'none'; // Nessun trascinamento asimmetrico
     
-    // Pulisce le viste
     materieList.innerHTML = '';
     risorseList.innerHTML = '<div class="placeholder-text">Seleziona una materia per visualizzare il materiale</div>';
 
-    // 3. Genera la lista materie (Esempio per il terzo anno)
-    let materie = [];
-    if (idAnno === 'terzo-anno') {
-        materie = [
-            { id: 'semeiotica-medica', nome: 'Semeiotica Medica', css: 's-blue' },
-            { id: 'microbiologia', nome: 'Microbiologia', css: 's-red' },
-            { id: 'endocrinologia', nome: 'Endocrinologia', css: 's-yellow' }
-        ];
-    }
+    // Lista materie di esempio
+    let materie = idAnno === 'terzo-anno' ? [
+        { id: 'semeiotica-medica', nome: 'Semeiotica Medica', css: 's-blue' },
+        { id: 'microbiologia', nome: 'Microbiologia', css: 's-red' },
+        { id: 'endocrinologia', nome: 'Endocrinologia', css: 's-yellow' }
+    ] : [];
 
     materie.forEach(m => {
         const pill = document.createElement('div');
         pill.className = `subject-pill ${m.css}`;
         pill.innerText = m.nome;
         pill.onclick = () => {
-            // Rimuovi 'active' dalle altre
             document.querySelectorAll('.subject-pill').forEach(p => p.classList.remove('active'));
             pill.classList.add('active');
-            caricaMateriale(m.id); // Chiama il DB per le risorse
+            caricaMateriale(m.id, m.nome); 
         };
         materieList.appendChild(pill);
     });
 
-    // 4. Avvia il morphing
     modalOverlay.classList.remove('hidden');
     
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-            // Applica transizione e nuove dimensioni centrali limitate in altezza
-            morphPanel.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-            morphPanel.style.width = '90%';
-            morphPanel.style.maxWidth = '800px';
-            morphPanel.style.height = '70vh'; // Non diventa troppo alto
-            morphPanel.style.maxHeight = '600px';
-            
-            // Centratura calcolata
-            morphPanel.style.top = 'calc(50% + 40px)'; 
-            morphPanel.style.left = '50%';
-            morphPanel.style.transform = 'translate(-50%, -50%)';
-            morphPanel.style.borderRadius = '36px';
+            // 2. Calcolo esatto dei pixel finali (Simmetrico, no %)
+            const finalW = Math.min(window.innerWidth * 0.9, 800);
+            const finalH = Math.min(window.innerHeight * 0.7, 550); // Altezza limitata proporzionata
+            const finalL = (window.innerWidth - finalW) / 2;
+            const finalT = (window.innerHeight - finalH) / 2 + 30; // Leggermente più in basso per l'header
+
+            morphPanel.style.transition = 'all 0.55s cubic-bezier(0.32, 0.72, 0, 1)';
+            morphPanel.style.top = finalT + 'px';
+            morphPanel.style.left = finalL + 'px';
+            morphPanel.style.width = finalW + 'px';
+            morphPanel.style.height = finalH + 'px';
+            morphPanel.style.borderRadius = '32px';
             
             morphPanel.classList.add('expanded');
         });
     });
 };
 
-// Carica il contenuto della colonna destra leggendo da Firebase
-async function caricaMateriale(idMateria) {
+// --- GESTIONE DATI SPLIT VIEW DESTRA ---
+async function caricaMateriale(idMateria, nomeMateria) {
     risorseList.innerHTML = '<div class="placeholder-text">Caricamento in corso...</div>';
     
     try {
@@ -167,28 +161,34 @@ async function caricaMateriale(idMateria) {
 
         if (docSnap.exists()) {
             const dati = docSnap.data();
-            risorseList.innerHTML = `<h3>${dati.titoloOriginale || 'Materiale'}</h3><br>`;
+            risorseList.innerHTML = `<h3 style="font-weight:500; font-size:18px; margin-bottom:15px;">${dati.titoloOriginale || nomeMateria}</h3>`;
             
             if (dati.risorse && dati.risorse.length > 0) {
                 dati.risorse.forEach(r => {
-                    risorseList.innerHTML += `<a href="${r.url}" target="_blank" class="resource-item"><i class="fas fa-file-alt"></i> ${r.nome}</a>`;
+                    let icon = r.tipo === 'quiz' ? 'fa-check-circle' : 'fa-file-pdf';
+                    risorseList.innerHTML += `
+                        <a href="${r.url}" target="_blank" class="resource-item">
+                            <i class="fas ${icon}"></i> 
+                            ${r.nome}
+                        </a>`;
                 });
             } else {
-                risorseList.innerHTML += '<p>Nessun materiale caricato.</p>';
+                risorseList.innerHTML += '<p style="color: var(--placeholder); font-size:14px;">Nessun materiale caricato per questa materia.</p>';
             }
         } else {
-            // Fallback locale se non c'è DB per mostrare il funzionamento
+            // Dati Fallback per test visuale
             risorseList.innerHTML = `
-                <a href="#" class="resource-item"><i class="fas fa-file-pdf"></i> Appunti di ${idMateria} (PDF)</a>
+                <h3 style="font-weight:500; font-size:18px; margin-bottom:15px;">${nomeMateria}</h3>
+                <a href="#" class="resource-item"><i class="fas fa-file-pdf"></i> Appunti Completi (PDF)</a>
                 <a href="#" class="resource-item"><i class="fas fa-check-circle"></i> Quiz Interattivo</a>
             `;
         }
     } catch(e) {
-        risorseList.innerHTML = '<div class="placeholder-text">Errore di connessione al database. Mostro dati di esempio.</div>';
+        risorseList.innerHTML = '<div class="placeholder-text">Errore DB. Database in modalità provvisoria.</div>';
     }
 }
 
-// Chiusura con reverse-morphing
+// Chiusura con reverse-morphing al pixel originario
 document.getElementById('morph-dot').addEventListener('click', chiudiPannello);
 modalOverlay.addEventListener('click', chiudiPannello);
 
@@ -198,15 +198,13 @@ function chiudiPannello() {
     modalOverlay.classList.add('hidden');
     morphPanel.classList.remove('expanded');
     
-    // Torna alla posizione e forma del bottone originale
     morphPanel.style.top = originalRect.top + 'px';
     morphPanel.style.left = originalRect.left + 'px';
     morphPanel.style.width = originalRect.width + 'px';
     morphPanel.style.height = originalRect.height + 'px';
-    morphPanel.style.transform = 'translate(0, 0)';
     morphPanel.style.borderRadius = '50px';
     
     setTimeout(() => {
         morphPanel.classList.add('hidden-morph');
-    }, 400);
+    }, 550);
 }
