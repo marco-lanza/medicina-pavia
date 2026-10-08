@@ -4,19 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Medicina Pavia</title>
-    <!-- Solo FontAwesome -->
+    <!-- Solo FontAwesome per le icone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Sfondo con gradienti (estremamente attenuati) -->
-    <div class="ambient-bg">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-    </div>
+    <!-- Sfondo Fotografico Dinamico (Leonardo da Vinci) -->
+    <div class="wallpaper-bg"></div>
 
-    <!-- Header sempre in primissimo piano (sopra il blur) -->
+    <!-- Header largo 800px allineato al pannello -->
     <header class="glass-pill top-header">
         <h1 class="nav-title">Medicina Pavia</h1>
         <div class="theme-toggle-container" onclick="toggleTheme()">
@@ -58,19 +55,20 @@
         </div>
     </main>
 
-    <!-- Overlay Blur (Copre tutto tranne l'Header) -->
+    <!-- Overlay Blur (Sfoca le foto, ma non l'Header) -->
     <div id="modal-overlay" class="modal-backdrop hidden"></div>
 
-    <!-- Pannello Morphing (Si espande dal bottone) -->
+    <!-- Pannello Morphing -->
     <div id="modal-content" class="morph-panel hidden-morph">
         <div class="panel-header" id="panel-header">
             <div id="morph-dot" class="morph-dot-element">
                 <i class="fas fa-chevron-left back-icon" id="back-icon"></i>
             </div>
+            <!-- Titolo che mantiene sempre il font sottile e invariato -->
             <h2 id="modal-title" class="panel-title">Anno</h2>
         </div>
         
-        <!-- Split View (Sinistra/Destra) -->
+        <!-- Split View (Sinistra Materie / Destra Risorse) -->
         <div id="split-view" class="split-view">
             <div class="split-left" id="materie-list"></div>
             <div class="split-right" id="risorse-list">
