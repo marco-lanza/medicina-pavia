@@ -1,48 +1,45 @@
 :root {
-    --bg-base: #f5f5f7;
     --text-main: #1d1d1f;
-    --glass-bg: rgba(255, 255, 255, 0.75);
-    --glass-border: rgba(255, 255, 255, 0.8);
-    --glass-border-strong: rgba(0, 0, 0, 0.12); /* Linee interne visibili */
-    --blob-1: #ffb4d6;
-    --blob-2: #c4d9ff;
-    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.05);
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-border-strong: rgba(0, 0, 0, 0.1); 
+    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.1);
     --placeholder: #8e8e93;
 }
 
 html.dark {
-    --bg-base: #000000; /* Nero assoluto */
     --text-main: #f5f5f7;
-    --glass-bg: rgba(18, 18, 18, 0.75);
-    --glass-border: rgba(255, 255, 255, 0.06);
-    --glass-border-strong: rgba(255, 255, 255, 0.12);
-    --blob-1: #3b0a20; /* Rosa scurissimo e attenuato */
-    --blob-2: #081530;
-    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.6);
-    --placeholder: #636366;
+    --glass-bg: rgba(0, 0, 0, 0.65); /* Nero assoluto per la dark mode */
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border-strong: rgba(255, 255, 255, 0.15);
+    --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.8);
+    --placeholder: #a1a1a6;
 }
 
 * {
     box-sizing: border-box; margin: 0; padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
     -webkit-font-smoothing: antialiased;
-    letter-spacing: -0.015em; /* Font più airy e moderno */
+    letter-spacing: -0.015em;
 }
 
 body {
-    background-color: var(--bg-base); color: var(--text-main);
-    font-weight: 400; /* Font leggero di base */
-    transition: background-color 0.4s ease;
-    height: 100vh; overflow: hidden;
+    background-color: transparent; color: var(--text-main);
+    font-weight: 400; height: 100vh; overflow: hidden;
     display: flex; flex-direction: column; align-items: center;
 }
 
-/* --- SFONDO BLURATO (Gradients appena percettibili) --- */
-.ambient-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: var(--bg-base); }
-.blob { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.15; transition: background 0.8s ease; }
-html.dark .blob { opacity: 0.25; }
-.blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--blob-1); }
-.blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: var(--blob-2); }
+/* --- SFONDO FOTOGRAFICO CROPPATO E CENTRATO --- */
+.wallpaper-bg {
+    position: fixed; inset: 0; z-index: -1;
+    background-image: url('foto.jpg'); 
+    background-size: cover; 
+    background-position: center;
+    transition: background-image 0.6s ease;
+}
+html.dark .wallpaper-bg {
+    background-image: url('foto_negate.jpg');
+}
 
 /* --- COMPONENTI GLASS --- */
 .glass-panel, .glass-pill, .morph-panel {
@@ -52,18 +49,18 @@ html.dark .blob { opacity: 0.25; }
     box-shadow: var(--shadow-main);
 }
 
-/* --- HEADER IN PRIMO PIANO --- */
+/* --- HEADER ALLARGATO A 800px --- */
 .top-header {
-    width: 90%; max-width: 600px; margin-top: 25px;
+    width: 90%; max-width: 800px; margin-top: 25px; /* Combacia con il pannello espanso */
     border-radius: 50px; padding: 14px 24px;
     display: flex; justify-content: space-between; align-items: center;
-    position: relative; z-index: 100; /* Assolutamente sopra il blur */
+    position: relative; z-index: 100;
 }
 .nav-title { font-size: 21px; font-weight: 500; letter-spacing: -0.02em; }
 
 .theme-toggle-container {
     position: relative; width: 60px; height: 30px;
-    background: rgba(120, 120, 120, 0.15); border-radius: 30px;
+    background: rgba(120, 120, 120, 0.2); border-radius: 30px;
     display: flex; align-items: center; justify-content: space-between;
     cursor: pointer; padding: 3px;
 }
@@ -88,11 +85,11 @@ html.dark .theme-slider { background: #333; transform: translateX(30px); }
 .login-panel h2 { font-size: 20px; font-weight: 500; margin-bottom: 25px; }
 .glass-input {
     width: 100%; padding: 15px; border-radius: 14px; border: 1px solid var(--glass-border-strong);
-    background: rgba(120,120,120,0.05); color: var(--text-main); font-weight: 500; outline: none; margin-bottom: 15px;
+    background: rgba(120,120,120,0.1); color: var(--text-main); font-weight: 500; outline: none; margin-bottom: 15px;
 }
 .glass-btn-solid { 
     width: 100%; padding: 15px; border-radius: 14px; border: none; 
-    background: var(--text-main); color: var(--bg-base); font-weight: 500; cursor: pointer; 
+    background: var(--text-main); color: var(--glass-bg); font-weight: 500; cursor: pointer; 
 }
 
 .years-container { gap: 12px; width: 90%; max-width: 360px; }
@@ -101,16 +98,16 @@ html.dark .theme-slider { background: #333; transform: translateX(30px); }
     display: flex; align-items: center; cursor: pointer;
     transition: background 0.3s;
 }
-.year-btn:hover { background: rgba(120,120,120,0.1); }
-.pill-dot { width: 10px; height: 10px; border-radius: 50%; background-color: var(--text-main); opacity: 0.25; margin-right: 18px; }
+.year-btn:hover { background: rgba(120,120,120,0.2); }
+.pill-dot { width: 10px; height: 10px; border-radius: 50%; background-color: var(--text-main); opacity: 0.3; margin-right: 18px; }
 .pill-text { font-size: 17px; font-weight: 500; color: var(--text-main); }
 
 /* --- MODAL E BLUR OVERLAY --- */
 .modal-backdrop {
-    position: fixed; inset: 0; z-index: 50; /* Blur totale sotto l'header */
+    position: fixed; inset: 0; z-index: 50;
     background: rgba(255, 255, 255, 0.05); 
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    transition: opacity 0.4s ease;
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+    transition: opacity 0.65s ease;
 }
 html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.4); }
 .modal-backdrop.hidden { opacity: 0; pointer-events: none; }
@@ -118,24 +115,23 @@ html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.4); }
 /* --- IL PANNELLO MORPHING --- */
 .morph-panel {
     position: absolute; overflow: hidden; z-index: 60;
-    /* Transizione ammorbidita e leggermente rallentata (0.55s) per eleganza */
-    transition: all 0.55s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: all 0.65s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .hidden-morph { opacity: 0; pointer-events: none; }
 
-/* --- L'HEADER INTERNO DEL PANNELLO --- */
+/* --- L'HEADER INTERNO --- */
 .panel-header {
     display: flex; align-items: center; 
-    margin: 0 25px; padding: 20px 0; /* Margin laterale, così la linea non tocca i bordi */
+    margin: 0 35px; padding: 20px 0;
     border-bottom: 1px solid transparent; transition: border-bottom 0.4s;
 }
 .morph-panel.expanded .panel-header { border-bottom: 1px solid var(--glass-border-strong); }
 
 .morph-dot-element {
     width: 10px; height: 10px; border-radius: 50%;
-    background-color: var(--text-main); opacity: 0.25; margin-right: 18px;
+    background-color: var(--text-main); opacity: 0.3; margin-right: 18px;
     display: flex; justify-content: center; align-items: center;
-    transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1); cursor: pointer;
+    transition: all 0.65s cubic-bezier(0.22, 1, 0.36, 1); cursor: pointer;
 }
 .morph-panel.expanded .morph-dot-element {
     width: 32px; height: 32px; opacity: 1;
@@ -144,29 +140,30 @@ html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.4); }
 .back-icon { font-size: 13px; color: var(--text-main); opacity: 0; transition: opacity 0.3s; }
 .morph-panel.expanded .back-icon { opacity: 1; }
 
+/* Titolo sempre sottile ed airy (Mantiene font-weight: 500 fisso) */
 .panel-title { font-size: 17px; font-weight: 500; transition: font-size 0.4s; }
-.morph-panel.expanded .panel-title { font-size: 20px; font-weight: 600; }
+.morph-panel.expanded .panel-title { font-size: 20px; font-weight: 500; }
 
-/* --- SPLIT VIEW (Sinistra/Destra) --- */
+/* --- SPLIT VIEW --- */
 .split-view {
     display: flex; height: calc(100% - 73px); opacity: 0;
-    transition: opacity 0.3s ease; transition-delay: 0.2s;
+    transition: opacity 0.4s ease; transition-delay: 0.25s;
 }
 .morph-panel.expanded .split-view { opacity: 1; }
 
 .split-left {
     width: 45%; border-right: 1px solid var(--glass-border-strong);
-    margin: 20px 0; padding: 0 20px; /* Margin verticale, la linea non tocca i bordi */
+    margin: 20px 0; padding: 0 25px 20px 35px;
     overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
 }
-.split-right { width: 55%; padding: 20px 25px; overflow-y: auto; }
+.split-right { width: 55%; padding: 20px 35px 20px 25px; overflow-y: auto; }
 
 .placeholder-text { 
     text-align: center; color: var(--placeholder); 
     margin-top: 50px; font-weight: 400; font-size: 15px; 
 }
 
-/* --- BOTTONI MATERIE --- */
+/* --- BOTTONI MATERIE E RISORSE --- */
 .subject-pill {
     width: 100%; padding: 14px 18px; border-radius: 20px;
     font-size: 14px; font-weight: 500; text-align: left;
@@ -174,22 +171,20 @@ html.dark .modal-backdrop { background: rgba(0, 0, 0, 0.4); }
     transition: transform 0.2s, opacity 0.2s;
 }
 .subject-pill:hover { transform: scale(1.02); }
-.subject-pill.active { border-color: var(--glass-border); opacity: 0.8; }
+.subject-pill.active { border-color: var(--glass-border); opacity: 0.9; }
 
-/* Colori materie */
 .s-red { background: rgba(255, 59, 48, 0.15); color: #c91408; }
 .s-blue { background: rgba(0, 122, 255, 0.15); color: #005bb5; }
 .s-yellow { background: rgba(255, 204, 0, 0.15); color: #a38200; }
-html.dark .s-red { background: rgba(255, 59, 48, 0.2); color: #ff6b60; }
-html.dark .s-blue { background: rgba(0, 122, 255, 0.2); color: #4da6ff; }
-html.dark .s-yellow { background: rgba(255, 204, 0, 0.2); color: #ffe033; }
+html.dark .s-red { background: rgba(255, 59, 48, 0.25); color: #ff6b60; }
+html.dark .s-blue { background: rgba(0, 122, 255, 0.25); color: #4da6ff; }
+html.dark .s-yellow { background: rgba(255, 204, 0, 0.25); color: #ffe033; }
 
-/* --- STILE RISORSE --- */
 .resource-item {
     display: flex; align-items: center; padding: 16px; margin-bottom: 12px;
-    border-radius: 18px; background: rgba(120,120,120,0.08);
+    border-radius: 18px; background: rgba(120,120,120,0.15);
     color: var(--text-main); font-weight: 500; font-size: 15px; text-decoration: none;
     transition: background 0.2s; border: 1px solid transparent;
 }
-.resource-item:hover { background: rgba(120,120,120,0.15); border-color: var(--glass-border-strong); }
+.resource-item:hover { background: rgba(120,120,120,0.25); border-color: var(--glass-border-strong); }
 .resource-item i { font-size: 18px; margin-right: 12px; color: var(--placeholder); }
