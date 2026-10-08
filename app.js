@@ -86,27 +86,50 @@ function gestisciRotta() {
     });
 }
 
-// Eseguiamo il login e diciamo a Firebase di NON salvarlo su disco
-document.getElementById('btn-login').addEventListener('click', () => {
+// --- LOGIN CON ANIMAZIONE CHECKMARK ---
+document.getElementById('btn-login').addEventListener('click', eseguiLogin);
+
+document.getElementById('pass-input').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        eseguiLogin();
+    }
+});
+
+function eseguiLogin() {
     const password = document.getElementById('pass-input').value;
+    const btn = document.getElementById('btn-login');
+    const originalText = btn.innerText;
+    
+    // Feedback di caricamento
+    btn.innerText = 'Verifica...';
     
     setPersistence(auth, browserSessionPersistence)
         .then(() => {
             return signInWithEmailAndPassword(auth, 'studenti@medicina.it', password);
         })
         .then(() => {
-            window.location.hash = sessionStorage.getItem('urlDesiderato') || '#/anni';
+            // Password corretta! Attiva l'animazione verde
+            btn.classList.add('btn-success');
+            btn.innerHTML = '<i class="fas fa-check" style="font-size: 18px;"></i>';
+            
+            // Attende 800ms (il tempo di vedere l'animazione) poi reindirizza
+            setTimeout(() => {
+                window.location.hash = sessionStorage.getItem('urlDesiderato') || '#/anni';
+                
+                // Pulisce in background per quando uscirà dal sito
+                setTimeout(() => {
+                    btn.classList.remove('btn-success');
+                    btn.innerText = originalText;
+                    document.getElementById('pass-input').value = '';
+                }, 500);
+            }, 800);
         })
-        .catch(error => alert('Password errata. Riprova.'));
-});
-
-// Permette di usare il tasto Invio per effettuare l'accesso
-document.getElementById('pass-input').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        e.preventDefault(); // Evita ricaricamenti anomali della pagina
-        document.getElementById('btn-login').click();
-    }
-});
+        .catch(error => {
+            btn.innerText = originalText;
+            alert('Password errata. Riprova.');
+        });
+}
 
 window.addEventListener('hashchange', gestisciRotta);
 window.addEventListener('load', gestisciRotta);
