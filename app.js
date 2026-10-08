@@ -86,7 +86,7 @@ function gestisciRotta() {
     });
 }
 
-// --- LOGIN CON ANIMAZIONE CHECKMARK ---
+// --- LOGIN CON ANIMAZIONE (Senza alert popup) ---
 document.getElementById('btn-login').addEventListener('click', eseguiLogin);
 
 document.getElementById('pass-input').addEventListener('keypress', function (e) {
@@ -99,35 +99,43 @@ document.getElementById('pass-input').addEventListener('keypress', function (e) 
 function eseguiLogin() {
     const password = document.getElementById('pass-input').value;
     const btn = document.getElementById('btn-login');
-    const originalText = btn.innerText;
     
-    // Feedback di caricamento
-    btn.innerText = 'Verifica...';
+    // Feedback di caricamento con rotellina
+    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verifica...';
+    btn.classList.remove('btn-error', 'btn-success'); // Pulisce stati precedenti
     
     setPersistence(auth, browserSessionPersistence)
         .then(() => {
             return signInWithEmailAndPassword(auth, 'studenti@medicina.it', password);
         })
         .then(() => {
-            // Password corretta! Attiva l'animazione verde
+            // Password corretta: Bottone verde con Checkmark
             btn.classList.add('btn-success');
-            btn.innerHTML = '<i class="fas fa-check" style="font-size: 18px;"></i>';
+            btn.innerHTML = '<i class="fas fa-check icon-anim" style="font-size: 20px;"></i>';
             
-            // Attende 800ms (il tempo di vedere l'animazione) poi reindirizza
+            // Attende esattamente 1 secondo prima di far entrare
             setTimeout(() => {
                 window.location.hash = sessionStorage.getItem('urlDesiderato') || '#/anni';
                 
-                // Pulisce in background per quando uscirà dal sito
+                // Ripristina il bottone di nascosto per i futuri login
                 setTimeout(() => {
                     btn.classList.remove('btn-success');
-                    btn.innerText = originalText;
+                    btn.innerText = 'Accedi';
                     document.getElementById('pass-input').value = '';
                 }, 500);
-            }, 800);
+            }, 1000);
         })
         .catch(error => {
-            btn.innerText = originalText;
-            alert('Password errata. Riprova.');
+            // Password errata: Bottone rosso con X e testo
+            btn.classList.add('btn-error');
+            btn.innerHTML = '<i class="fas fa-times icon-anim" style="margin-right: 8px;"></i> Password errata. Riprova.';
+            
+            // Cancella l'errore e torna normale dopo 2.5 secondi
+            setTimeout(() => {
+                btn.classList.remove('btn-error');
+                btn.innerText = 'Accedi';
+                document.getElementById('pass-input').value = '';
+            }, 2500);
         });
 }
 
@@ -176,8 +184,8 @@ window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
         ];
     } else if (idAnno === 'quarto-anno') {
         materie = [
-            { id: 'pneumologia', nome: 'Pneumologia', css: 's-mint' },
-            { id: 'ortopedia', nome: 'Ortopedia', css: 's-indigo' },
+            { id: 'pneumologia', nome: 'Pneumologia', css: 's-blue' },
+            { id: 'ortopedia', nome: 'Ortopedia', css: 's-green' },
             { id: 'cardiologia', nome: 'Cardiologia', css: 's-red' },
             { id: 'nefrologia', nome: 'Nefrologia', css: 's-yellow' },
             { id: 'gastroenterologia', nome: 'Gastroenterologia', css: 's-orange' },
@@ -186,7 +194,7 @@ window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
             { id: 'dermatologia', nome: 'Dermatologia', css: 's-pink' }
         ];
     }
-
+  
     materie.forEach(m => {
         const pill = document.createElement('div');
         pill.className = `subject-pill ${m.css}`;
