@@ -19,6 +19,8 @@ const firebaseConfig = {
     measurementId: "G-BTMDMC3ZEN"
   };
 
+
+
 // 3. Inizializziamo l'app, l'autenticazione e il database
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
