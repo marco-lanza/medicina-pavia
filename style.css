@@ -242,3 +242,24 @@ html.dark .s-pink   { background: rgba(255, 45, 85, 0.25);  color: #ff6b8a; }
 }
 .resource-item:hover { background: rgba(120,120,120,0.25); border-color: var(--glass-border-strong); }
 .resource-item i { font-size: 18px; margin-right: 12px; color: var(--placeholder); }
+
+/* --- ANIMAZIONI LOGIN --- */
+.glass-btn-solid { 
+    transition: all 0.3s ease; 
+}
+.btn-success {
+    background-color: #34c759 !important; /* Verde Apple */
+    color: #ffffff !important;
+}
+.btn-error {
+    background-color: #ff3b30 !important; /* Rosso Apple */
+    color: #ffffff !important;
+}
+.icon-anim {
+    display: inline-block;
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+@keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
