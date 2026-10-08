@@ -46,7 +46,7 @@ window.toggleTheme = function() {
     applyTheme(currentTheme);
 };
 
-// --- ROUTER E LOGIN ---
+// --- ROUTER ---
 function mostraSchermata(idView) {
     document.querySelectorAll('.view-section').forEach(view => view.style.display = 'none');
     const viewDaMostrare = document.getElementById(idView);
@@ -77,7 +77,6 @@ document.getElementById('btn-login').addEventListener('click', () => {
     const password = document.getElementById('pass-input').value;
     signInWithEmailAndPassword(auth, 'studenti@medicina.it', password)
         .then(() => {
-            // Dopo il login sposta all'hash desiderato
             window.location.hash = sessionStorage.getItem('urlDesiderato') || '#/anni';
         })
         .catch(error => alert('Password errata. Riprova.'));
@@ -86,8 +85,7 @@ document.getElementById('btn-login').addEventListener('click', () => {
 window.addEventListener('hashchange', gestisciRotta);
 window.addEventListener('load', gestisciRotta);
 
-
-// --- ANIMAZIONE MORPHING (Senza oscillazioni) ---
+// --- ANIMAZIONE MORPHING SIMMETRICA ---
 const modalOverlay = document.getElementById('modal-overlay');
 const morphPanel = document.getElementById('modal-content');
 const materieList = document.getElementById('materie-list');
@@ -96,8 +94,6 @@ let originalRect = null;
 
 window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
     document.getElementById('modal-title').innerText = nomeAnno;
-    
-    // 1. Calcolo esatto del pixel di partenza
     originalRect = btnElement.getBoundingClientRect();
     
     morphPanel.style.transition = 'none';
@@ -107,12 +103,11 @@ window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
     morphPanel.style.width = originalRect.width + 'px';
     morphPanel.style.height = originalRect.height + 'px';
     morphPanel.style.borderRadius = '50px';
-    morphPanel.style.transform = 'none'; // Nessun trascinamento asimmetrico
+    morphPanel.style.transform = 'none'; 
     
     materieList.innerHTML = '';
     risorseList.innerHTML = '<div class="placeholder-text">Seleziona una materia per visualizzare il materiale</div>';
 
-    // Lista materie di esempio
     let materie = idAnno === 'terzo-anno' ? [
         { id: 'semeiotica-medica', nome: 'Semeiotica Medica', css: 's-blue' },
         { id: 'microbiologia', nome: 'Microbiologia', css: 's-red' },
@@ -135,13 +130,12 @@ window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
     
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-            // 2. Calcolo esatto dei pixel finali (Simmetrico, no %)
-            const finalW = Math.min(window.innerWidth * 0.9, 800);
-            const finalH = Math.min(window.innerHeight * 0.7, 550); // Altezza limitata proporzionata
+            const finalW = Math.min(window.innerWidth * 0.9, 800); // 800px esatti come l'header
+            const finalH = Math.min(window.innerHeight * 0.7, 550); 
             const finalL = (window.innerWidth - finalW) / 2;
-            const finalT = (window.innerHeight - finalH) / 2 + 30; // Leggermente più in basso per l'header
+            const finalT = (window.innerHeight - finalH) / 2 + 30; 
 
-            morphPanel.style.transition = 'all 0.55s cubic-bezier(0.32, 0.72, 0, 1)';
+            morphPanel.style.transition = 'all 0.65s cubic-bezier(0.22, 1, 0.36, 1)';
             morphPanel.style.top = finalT + 'px';
             morphPanel.style.left = finalL + 'px';
             morphPanel.style.width = finalW + 'px';
@@ -153,7 +147,6 @@ window.apriPannelloAnno = function(nomeAnno, idAnno, btnElement) {
     });
 };
 
-// --- GESTIONE DATI SPLIT VIEW DESTRA ---
 async function caricaMateriale(idMateria, nomeMateria) {
     risorseList.innerHTML = '<div class="placeholder-text">Caricamento in corso...</div>';
     
@@ -178,7 +171,6 @@ async function caricaMateriale(idMateria, nomeMateria) {
                 risorseList.innerHTML += '<p style="color: var(--placeholder); font-size:14px;">Nessun materiale caricato per questa materia.</p>';
             }
         } else {
-            // Dati Fallback per test visuale
             risorseList.innerHTML = `
                 <h3 style="font-weight:500; font-size:18px; margin-bottom:15px;">${nomeMateria}</h3>
                 <a href="#" class="resource-item"><i class="fas fa-file-pdf"></i> Appunti Completi (PDF)</a>
@@ -190,7 +182,6 @@ async function caricaMateriale(idMateria, nomeMateria) {
     }
 }
 
-// Chiusura con reverse-morphing al pixel originario
 document.getElementById('morph-dot').addEventListener('click', chiudiPannello);
 modalOverlay.addEventListener('click', chiudiPannello);
 
@@ -208,5 +199,5 @@ function chiudiPannello() {
     
     setTimeout(() => {
         morphPanel.classList.add('hidden-morph');
-    }, 550);
+    }, 650);
 }
